@@ -1,0 +1,121 @@
+<?php
+/**
+ * Campaign Monitor Magento Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please
+ * send an email to license@magento.com and you will be sent a copy.
+ *
+ * @package Campaignmonitor_Createsend
+ * @copyright Copyright (c) 2015 Campaign Monitor (https://www.campaignmonitor.com/)
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+?>
+
+<?php
+/**
+ * Template for block Campaignmonitor_Createsend_Block_Adminhtml_Email_View_Tab_Opens
+ * Template for block Campaignmonitor_Createsend_Block_Adminhtml_Email_View_Tab_Clicks
+ *
+ */
+?>
+<?php
+
+$email = $this->getEmail();
+if (array_key_exists($this->getTrackIndex(), $email)) {
+    $tracks = $email[$this->getTrackIndex()];
+} else {
+    $tracks = array();
+}
+
+$fieldNames = array(
+    'EmailAddress'  => 'Email Address',
+    'Date'          => 'Date',
+    'IPAddress'     => 'IP Address',
+);
+
+$clickFields = array(
+    'URL'           => 'URL',
+);
+
+$geoFields = array(
+    'Latitude'      => 'Latitude',
+    'Longitude'     => 'Longitude',
+    'City'          => 'City',
+    'Region'        => 'Region',
+    'CountryCode'   => 'Country Code',
+    'CountryName'   => 'Country Name',
+);
+
+$clientFields = array(
+    'Name'      => 'Name',
+    'Version'   => 'Version',
+);
+
+?>
+
+<div class="entry-edit-head"><h4 class="icon-head"><?php echo $this->__($this->getTrackIndex()) ?></h4></div>
+<div class="grid">
+    <table cellspacing="0" class="data">
+        <thead>
+        <tr class="headings">
+            <?php
+
+            if ($this->getTrackIndex() === 'Clicks') {
+                $fieldNames = array_merge($fieldNames, $clickFields);
+            }
+            $allFields = array_merge($fieldNames, $geoFields);
+            if ($this->getTrackIndex() === 'Opens') {
+                $allFields = array_merge($allFields, $clientFields);
+            }
+            foreach ($allFields as $fieldName => $displayName) {
+                echo '<th>' . htmlentities($this->__($displayName)) . '</th>';
+            }
+            ?>
+        </tr>
+        </thead>
+
+        <tbody>
+        <?php foreach ($tracks as $track) { ?>
+            <tr>
+                <?php
+                foreach ($fieldNames as $fieldName => $displayName) {
+                    echo '<td>';
+                    if (isset($track[$fieldName])) {
+                        echo htmlentities($track[$fieldName]);
+                    } else {
+                        echo '&nbsp;';
+                    }
+                    echo '</td>';
+                }
+                foreach ($geoFields as $fieldName => $displayName) {
+                    echo '<td>';
+                    if (isset($track['Geolocation'][$fieldName])) {
+                        echo htmlentities($track['Geolocation'][$fieldName]);
+                    } else {
+                        echo '&nbsp;';
+                    }
+                    echo '</td>';
+                }
+                if ($this->getTrackIndex() === 'Opens') {
+                    foreach ($clientFields as $fieldName => $displayName) {
+                        echo '<td>';
+                        if (isset($track['MailClient'][$fieldName])) {
+                            echo htmlentities($track['MailClient'][$fieldName]);
+                        } else {
+                            echo '&nbsp;';
+                        }
+                        echo '</td>';
+                    }
+                }
+                ?>
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
+</div>
+<?php echo $this->getChildHtml('', true, true); ?>

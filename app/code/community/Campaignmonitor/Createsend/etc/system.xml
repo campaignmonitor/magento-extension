@@ -1,0 +1,300 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Campaign Monitor Magento Extension
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0)
+* that is available through the world-wide-web at this URL:
+* http://opensource.org/licenses/osl-3.0.php
+* If you are unable to obtain it through the world-wide-web, please
+* send an email to license@magento.com and you will be sent a copy.
+*
+* @package Campaignmonitor_Createsend
+* @copyright Copyright (c) 2015 Campaign Monitor (https://www.campaignmonitor.com/)
+* @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+*/
+-->
+<config>
+    <tabs>
+        <campaignmonitor translate="label" module="createsend">
+            <label>Campaign Monitor</label>
+            <sort_order>101</sort_order>
+        </campaignmonitor>
+    </tabs>
+
+    <sections>
+        <createsend_general translate="label" module="createsend">
+            <label>General</label>
+            <tab>campaignmonitor</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <api translate="label">
+                    <label>API</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <api_key translate="label comment">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <backend_model>createsend/config_backend_apikey</backend_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[If you have multiple clients, you can find your client's API key <a href="https://www.campaignmonitor.com/api/getting-started/?#clientid" target="_blank">here</a>.<br />
+                                If you're sending for yourself, you can find your own API key <a href="http://help.campaignmonitor.com/topic.aspx?t=1240" target="_blank">here</a>.
+                                <div id="createsend_api_key_error_message"></div>]]></comment>
+                        </api_key>
+                        <api_client_id translate="label comment">
+                            <label>Select your Campaign Monitor Client</label>
+                            <frontend_type>select</frontend_type>
+                            <backend_model>createsend/config_backend_listid</backend_model>
+                            <source_model>createsend/config_clientSelection</source_model>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_client_id>
+                        <list_id translate="label comment">
+                            <label>Select a List</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>createsend/config_listSelection</source_model>
+                            <backend_model>createsend/config_backend_listid</backend_model>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>The Campaign Monitor subscriber list your Magento users will subscribe to or unsubscribe from.</comment>
+                        </list_id>
+                        <new_list_name translate="label comment">
+                            <label>Create a new list in Campaign Monitor</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><list_id>NEW_LIST</list_id></depends>
+                            <comment>Name this new list</comment>
+                        </new_list_name>
+                    </fields>
+                </api>
+                <advanced translate="label">
+                    <label>Advanced</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>200</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <api_test_button translate="label comment">
+                            <label>Test API</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>campaignmonitor_createsend_block_testApi</frontend_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Test your credentials are correct and can connect to Campaign Monitor's API. Make sure to click Save Config after entering your API key before testing.</comment>
+                        </api_test_button>
+                        <create_segment_button translate="label">
+                            <label>Create Example Segments</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>campaignmonitor_createsend_block_createExampleSegments</frontend_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Create a set of Campaign Monitor example segments to target sub-groups of subscribers based on conditions.</comment>
+                        </create_segment_button>
+                        <logging translate="label comment">
+                            <label>Enable Logging</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Log Campaign Monitor extension information and API requests. Requires Magento logging to be enabled.</comment>
+                        </logging>
+                        <webhook_enabled translate="label comment">
+                            <label>Enable Webhooks</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Synchronize subscribes and unsubscribes performed in Campaign Monitor with Magento.</comment>
+                        </webhook_enabled>
+                        <subscriber_synchronisation_enabled translate="label comment">
+                            <label>Enable Batch Subscriber Synchronization</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>If 'Yes', perform a nightly batch synchronization of list subscribers.</comment>
+                        </subscriber_synchronisation_enabled>
+                        <subscriber_synchronisation_resolution_method translate="label comment">
+                            <label>Subscription Synchronization Conflict Resolution Method</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>campaignmonitor_createsend_model_config_ConflictResolutionMethod</source_model>
+                            <sort_order>210</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><subscriber_synchronisation_enabled>1</subscriber_synchronisation_enabled></depends>
+                            <comment><![CDATA[Set to "Timestamp" to resolve subscription status conflicts by using the latest timestamp found in either Campaign Monitor or Magento.
+                                <br />
+                                Set to "Preferred Source" to resolve subscription status conflicts by choosing Campaign Monitor or Magento.]]></comment>
+                        </subscriber_synchronisation_resolution_method>
+                        <subscriber_synchronisation_preferred_source translate="label comment">
+                            <label>Preferred Source</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>campaignmonitor_createsend_model_config_SubscriptionSources</source_model>
+                            <sort_order>220</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <subscriber_synchronisation_enabled>1</subscriber_synchronisation_enabled>
+                                <subscriber_synchronisation_resolution_method>source</subscriber_synchronisation_resolution_method>
+                            </depends>
+                        </subscriber_synchronisation_preferred_source>
+                        <magento_cron_enabled translate="label comment">
+                            <label>Use Magento cron</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>300</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Perform subscriber synchronization and email retrieval using Magento's cron system. If set to "No," a system cron job will need to be set up.</comment>
+                        </magento_cron_enabled>
+                        <create_segment_button translate="label comment">
+                            <label>Create Example Segments</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>campaignmonitor_createsend_block_createExampleSegments</frontend_model>
+                            <sort_order>700</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Create a set of Campaign Monitor example segments to target sub-groups of subscribers based on purchasing habits.</comment>
+                        </create_segment_button>
+                    </fields>
+                </advanced>
+            </groups>
+        </createsend_general>
+        <createsend_customers translate="label" module="createsend">
+            <label>Customers</label>
+            <tab>campaignmonitor</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>20</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <attributes translate="label">
+                    <label>Attributes</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <m_to_cm_attributes translate="label comment">
+                            <label>Custom Field Mapping</label>
+                            <frontend_model>campaignmonitor_createsend_block_linkedattributes</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </m_to_cm_attributes>
+                    </fields>
+                </attributes>
+                <wishlists translate="label">
+                    <label>Wishlists</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>200</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <max_wishlist_items translate="label comment">
+                            <label>Number of wishlist products to include</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>validate-zero-or-greater</validate>
+                            <comment>Sets the maximum number of products from a customer's wishlist to send to Campaign Monitor's custom fields. Set to 0 to not send any wishlist data.</comment>
+                        </max_wishlist_items>
+                        <wishlist_product_attributes translate="label">
+                            <label>Custom Field Mapping</label>
+                            <frontend_model>campaignmonitor_createsend_block_wishlistattributes</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </wishlist_product_attributes>
+                    </fields>
+                </wishlists>
+            </groups>
+        </createsend_customers>
+        <createsend_transactional translate="label" module="createsend">
+            <label>Transactional</label>
+            <tab>campaignmonitor</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>30</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <emails translate="label">
+                    <label>Transactional Emails</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <transactional_email_enabled translate="label comment">
+                            <label>Enable Transactional Emails</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Send Magento generated transactional emails via Campaign Monitor. You will be able to view recently sent emails using the Magento Admin Panel.</comment>
+                        </transactional_email_enabled>
+                        <transactional_email_retention_days translate="label comment">
+                            <label>Email Data Retention (days)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <validate>validate-zero-or-greater</validate>
+                            <comment>Number of days to retain email data in Magento. This will determine how long you are able to view emails in the Magento Admin Panel.</comment>
+                            <depends><transactional_email_enabled>1</transactional_email_enabled></depends>
+                        </transactional_email_retention_days>
+                    </fields>
+                </emails>
+            </groups>
+        </createsend_transactional>
+    </sections>
+</config>

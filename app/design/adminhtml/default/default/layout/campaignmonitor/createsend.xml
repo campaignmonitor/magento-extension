@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Campaign Monitor Magento Extension
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0)
+* that is available through the world-wide-web at this URL:
+* http://opensource.org/licenses/osl-3.0.php
+* If you are unable to obtain it through the world-wide-web, please
+* send an email to license@magento.com and you will be sent a copy.
+*
+* @package Campaignmonitor_Createsend
+* @copyright Copyright (c) 2015 Campaign Monitor (https://www.campaignmonitor.com/)
+* @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+*/
+-->
+<layout version="0.1.0">
+    <adminhtml_customer_edit>
+        <reference name="customer_edit_tabs">
+            <block type="createsend/adminhtml_customer_edit_grid" name="createsend_email_grid" after="-">
+                <action method="setTabLabel" module="createsend" translate="label">
+                    <label>Campaign Monitor Emails</label>
+                </action>
+                <action method="setTabTitle" module="createsend" translate="title">
+                    <title>Campaign Monitor Emails</title>
+                </action>
+            </block>
+            <action method="addTab">
+                <name>createsend_email_grid</name>
+                <block>createsend_email_grid</block>
+            </action>
+        </reference>
+    </adminhtml_customer_edit>
+
+    <adminhtml_createsend_email_index>
+        <reference name="content">
+            <block type="createsend/adminhtml_switcher" name="scope_switcher"/>
+            <block type="createsend/adminhtml_email" name="email_list"/>
+        </reference>
+    </adminhtml_createsend_email_index>
+
+    <adminhtml_createsend_email_grid>
+        <remove name="root"/>
+        <block type="createsend/adminhtml_email_grid" name="email_grid" output="toHtml"/>
+    </adminhtml_createsend_email_grid>
+
+    <adminhtml_createsend_email_view>
+        <reference name="left">
+            <block type="createsend/adminhtml_email_view_tabs" name="email_tabs">
+                <block type="createsend/adminhtml_email_view_tab_details"
+                       name="email_details"
+                       template="campaignmonitor/createsend/email/details.phtml">
+                    <action method="setTabLabel" module="createsend" translate="label">
+                        <label>Details</label>
+                    </action>
+                    <action method="setTabTitle" module="createsend" translate="title">
+                        <title>Email Details</title>
+                    </action>
+                </block>
+                <action method="addTab">
+                    <name>email_details</name>
+                    <block>email_details</block>
+                </action>
+
+                <block type="createsend/adminhtml_email_view_tab_html"
+                       name="email_html"
+                       template="campaignmonitor/createsend/email/html.phtml">
+                    <action method="setTabLabel" module="createsend" translate="label">
+                        <label>Body (HTML)</label>
+                    </action>
+                    <action method="setTabTitle" module="createsend" translate="title">
+                        <title>Email Body (HTML Format)</title>
+                    </action>
+                </block>
+                <action method="addTab">
+                    <name>email_html</name>
+                    <block>email_html</block>
+                </action>
+
+                <block type="createsend/adminhtml_email_view_tab_text"
+                       name="email_text"
+                       template="campaignmonitor/createsend/email/text.phtml">
+                    <action method="setTabLabel" module="createsend" translate="label">
+                        <label>Body (Text)</label>
+                    </action>
+                    <action method="setTabTitle" module="createsend" translate="title">
+                        <title>Email Body (Text Format)</title>
+                    </action>
+                </block>
+                <action method="addTab">
+                    <name>email_text</name>
+                    <block>email_text</block>
+                </action>
+
+                <block type="createsend/adminhtml_email_view_tab_opens"
+                       name="email_opens"
+                       template="campaignmonitor/createsend/email/tracking.phtml">
+                    <action method="setTabLabel" module="createsend" translate="label">
+                        <label>Opens</label>
+                    </action>
+                    <action method="setTabTitle" module="createsend" translate="title">
+                        <title>Opens</title>
+                    </action>
+                </block>
+                <action method="addTab">
+                    <name>email_opens</name>
+                    <block>email_opens</block>
+                </action>
+
+                <block type="createsend/adminhtml_email_view_tab_clicks"
+                       name="email_clicks"
+                       template="campaignmonitor/createsend/email/tracking.phtml">
+                    <action method="setTabLabel" module="createsend" translate="label">
+                        <label>Clicks</label>
+                    </action>
+                    <action method="setTabTitle" module="createsend" translate="title">
+                        <title>Clicks</title>
+                    </action>
+                </block>
+                <action method="addTab">
+                    <name>email_clicks</name>
+                    <block>email_clicks</block>
+                </action>
+            </block>
+        </reference>
+
+        <reference name="content">
+            <block type="createsend/adminhtml_email_view" name="email_view"/>
+        </reference>
+
+    </adminhtml_createsend_email_view>
+</layout>

@@ -1,0 +1,40 @@
+<?php
+/**
+ * Campaign Monitor Magento Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain it through the world-wide-web, please
+ * send an email to license@magento.com and you will be sent a copy.
+ *
+ * @package Campaignmonitor_Createsend
+ * @copyright Copyright (c) 2015 Campaign Monitor (https://www.campaignmonitor.com/)
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+?>
+
+<?php
+/**
+ * Template for block Campaignmonitor_Createsend_Block_Adminhtml_Email_View_Tab_Html
+ */
+?>
+<?php
+    /** @var Campaignmonitor_Createsend_Block_Adminhtml_Email_View_Tab_Html $this */
+    /** @var array $email */
+    $email = $this->getEmail();
+?>
+<div class="entry-edit">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-customer-view"><?php echo Mage::helper('createsend')->__('Message Body (HTML)') ?>
+        </h4>
+    </div>
+
+    <div>
+        <iframe sandbox="allow-same-origin" src="<?php echo $this->getEmailViewUrl($email['email_id']); ?>" width="100%" height="800">
+        </iframe>
+    </div>
+</div>
+<?php echo $this->getChildHtml('', true, true); ?>

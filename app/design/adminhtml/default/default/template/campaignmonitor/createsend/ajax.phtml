@@ -1,0 +1,42 @@
+<?php
+/** @var Campaignmonitor_Createsend_Block_AjaxButton $this */
+?>
+<script type="text/javascript">
+    //<![CDATA[
+    function <?php echo $this->getAjaxFunction() ?>()
+    {
+        document.getElementById('<?php echo $this->getAjaxFunction() ?>_status')['innerHTML'] = 'Sending request...';
+        new Ajax.Request(
+            '<?php echo $this->getAjaxUrl() ?>',
+            {
+                method: 'get',
+                onSuccess: function(response)
+                {
+                    if (response.responseText) {
+                        var reply = eval ("(" + response.responseText + ")");
+                        setMessage<?php echo $this->getAjaxFunction() ?>(reply.messages);
+                    }
+                }
+            }
+        );
+    }
+
+    function setMessage<?php echo $this->getAjaxFunction() ?>(messages)
+    {
+        var d = document.getElementById('<?php echo $this->getAjaxFunction() ?>_status');
+
+        var html = '<ul class="messages">';
+
+        for (index = 0; index < messages.length; ++index) {
+            message = messages[index];
+            html += '<li class="' + message.status + '-msg">' + message.message;
+        }
+        html += '</ul>';
+
+        d['innerHTML'] = html;
+    }
+    //]]>
+</script>
+
+<?php echo $this->getButtonHtml() ?>
+<div id="<?php echo $this->getAjaxFunction() ?>_status"></div>
