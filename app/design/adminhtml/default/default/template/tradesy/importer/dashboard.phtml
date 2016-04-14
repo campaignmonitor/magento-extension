@@ -1,0 +1,559 @@
+<?php
+
+
+
+$block = $this;
+
+$currentUser = Mage::getModel('tradesy_importer/user')->getCurrent();
+$userId = $currentUser->getId();
+
+$adminAjaxUrl = $this->helper->getAjaxUrl();
+
+echo "<pre>";
+
+
+
+
+// get mapped attributes if any
+$categoryAttributes = Mage::getModel('tradesy_importer/category_attributes')->getMappedAttributes(2);
+
+if (!empty($categoryAttributes)){
+    // load product
+    $t = Mage::getModel('catalog/product')->load(8829);
+
+
+
+
+    $options = Mage::getModel('tradesy_importer/category_attribute_options')->getOptions(2, 92);
+
+    foreach ($categoryAttributes as $categoryAttribute){
+        $id = $categoryAttribute['attribute_id'];
+        // get options for this attribute
+        $mappedOptions =  Mage::getModel('tradesy_importer/category_attribute_options')->getOptions(2, $id);
+
+        $attribute = $t->getResource()->getAttribute($id);
+
+        $code = $attribute->getAttributeCode();
+        $attributeName = implode('_', array_map('ucfirst', explode('_', $code)));
+
+
+        if (!empty($attribute)){
+            // get the assign attribute value for this product
+            $selectedAttributeId = call_user_func(array($t, "get$attributeName"));
+            // get the label for this product
+            $attribute->getSource()->getOptionText($selectedAttributeId);
+
+            echo $selectedAttributeId . "<br>";
+            foreach ($mappedOptions as $option) {
+
+                $match = $option['option_id'] == $selectedAttributeId;
+
+                if ($match){
+                    print_r($option);
+                }
+            }
+
+
+        }
+
+
+    }
+    $productUserDefinedAttributes = $this->helper->getUserDefineProductAttributes();
+    foreach ($productUserDefinedAttributes as $attribute){
+        $attributeName = ucwords($attribute['code']);
+        $attributeCode = $attribute['code'];
+        print_r($attributeName);
+        echo "<br>";
+
+        /**
+         * get attribute collection
+         */
+        $attribute = $t->getResource()->getAttribute(92);
+
+        if (!empty($attribute)){
+            // get the assign attribute for this product
+            $selectedAttributeId = call_user_func(array($t, "get$attributeName"));
+            // get the label for this product
+            echo $attribute->getSource()->getOptionText($selectedAttributeId);
+            echo "<br>";
+        }
+    }
+
+
+    print_r($categoryAttributes);
+    print_r($options);
+}
+
+echo "</pre>";
+
+$formKey = Mage::getSingleton('core/session')->getFormKey() ;
+
+$user = $this->helper->getUser();
+
+$userEmail = $user->getEmail();
+$userFirstname = $user->getFirstname();
+$userLastname = $user->getLastname();
+$userUsername = $user->getUsername();
+$categoryBlock = $this->getLayout()->createBlock('tradesy_importer/adminhtml_mapper');
+$storeName = str_replace(' ', "_", $this->store->getFrontendName());
+
+$orders = Mage::getModel('tradesy_importer/tradesy_order')->getCollection()->addFieldToFilter('user_id', $userId);
+
+/*
+foreach (Mage::app()->getWebsites() as $website) {
+
+    echo $website->getName() . " ";
+    echo $website->getId() . "<br>";
+    echo $website->getStore();
+    foreach ($website->getGroups() as $group) {
+
+        $stores = $group->getStores();
+        foreach ($stores as $store) {
+
+          echo  "store id: " . $store->getId() ." ".$store->getCode(). "category id:  " . $store->getRootCategoryId() . " <br/>";
+
+        }
+
+    }
+
+}
+*/
+
+$mapAccount = Mage::getSingleton('core/session')->getCategoryMaps();
+?>
+
+
+<?php  if (!$this->helper->isUserConnected()) : ?>
+
+    <div class="loginNavTabsContainer">
+        <a href="#" onclick="openLoginContainer('form_accountForm');return false;" id="form_accountFormLink"><span
+                class="loginNavNumber">1</span>Your Account</a>
+
+        <a href="#" onclick="openLoginContainer('form_setupYourStore');return false;" id="form_setupYourStoreLink"><span
+                class="loginNavNumber">2</span>Setup Your Store</a>
+        <a href="#" onclick="openLoginContainer('form_shippingMethod');return false;" id="form_shippingMethodLink"><span
+                class="loginNavNumber">3</span>Choose Your Shipping Method</a>
+
+        <a href="#" onclick="openLoginContainer('form_itemCategoryMapping');return false;"
+           id="form_itemCategoryMappingLink"><span class="loginNavNumber">4</span>Category Mapping</a>
+
+        <!--   <a href="#" onclick="openLoginContainer('form_itemProductTypeMapping');return false;"
+            id="form_itemProductTypeMappingLink"><span class="loginNavNumber">5</span>Map Your Items 2</a>
+     --
+         <a href="#" onclick="openLoginContainer('form_payoutMethod');return false;" id="form_payoutMethodLink"><span
+                 class="loginNavNumber">5</span>Verify Your Identity</a>
+                 -->
+    </div>
+
+    <div class="setup-container">
+    <div class="accountForm" id="form_accountForm" style="display: none;">
+        <div id="form_accountFormCreate">
+            <div>
+                <h2>Step 1: Create a Tradesy account</h2>
+            </div>
+            <form method="post" action="<?php echo $adminAjaxUrl; ?>">
+
+                <?php
+                echo '<div>Map account to: <select name="account_mapping" >';
+                echo '<option value="-1" >All Store Views</option>';
+                foreach (Mage::app()->getWebsites() as $website) {
+
+                    echo '<option data-website-name="'.$website->getName().'" value="'.$website->getId().'" data-website-code="'.$website->getCode() .'"/>';
+                    echo $website->getName();
+
+                    echo "</option>";
+
+                }
+                echo "</select></div>";
+                ?>
+
+
+                <input type="hidden" name="type" value="createAccount">
+                <input type="hidden" name="form_key" value="<?php echo $formKey  ?>"/>
+
+                <div>
+                    <label>Full Name</label><br>
+                    <input type="text" name="name" id="name" placeholder="Enter Your Full Name"
+                           value="<?php echo $userFirstname; ?>"/>
+
+                    <div id="nameErrorSpan" class="error"></div>
+                </div>
+
+                <div>
+                    <label>Email Address</label><br>
+                    <input type="text" name="email" id="createAccountEmail" placeholder="Enter Your Email Address"
+                           value="<?php echo $userEmail; ?>"/>
+
+                    <div id="createAccountEmailErrorSpan" class="error"></div>
+                </div>
+
+                <div>
+                    <label>Password</label><br>
+                    <input type="password" name="password" id="createAccountPass" placeholder="Create Password" value=""/>
+
+                    <div id="createAccountPassErrorSpan" class="error"></div>
+                </div>
+
+                <div id="password2Wrapper">
+                    <label>Confirm Password</label><br>
+                    <input type="password" name="password2" id="createAccountPass2" placeholder="Confirm Password" value=""/>
+
+                    <div id="createAccountPass2ErrorSpan" class="error"></div>
+                </div>
+
+                <input type="button" class="btn med black fleft" id="joinButton"  onclick="return createAccountFormSubmitted(jQuery(this).parent('form'));" value="Join Tradesy">
+
+                <div>Already have an account? <a href="#" onclick="accountCreateLoginToggle('form_accountFormCreate');return false;">Login
+                        now</a></div>
+            </form>
+        </div>
+
+
+        <div id="form_accountFormSignin" style="display:none;">
+            <div>
+                <h2>Step 1: Link an existing Tradesy account</h2>
+            </div>
+            <form class="accountForm" method="post" action="<?php echo Mage::helper("adminhtml")->getUrl('/tradesy/login'); ?>">
+                <input type="hidden" name="form_key" value="<?php echo $formKey  ?>"/>
+
+                <input type="hidden" name="type" value="connectAccount">
+
+                <div>
+                    <label>Email Address</label><br>
+                    <input type="text" name="email" id="loginAccountEmail" placeholder="Enter Your Email Address"
+                           value=""/>
+
+                    <div id="loginAccountEmailErrorSpan" class="error"></div>
+                </div>
+
+                <div>
+                    <label>Password</label><br>
+                    <input type="password" name="password" id="loginAccountPass" placeholder="Enter your password"/>
+
+                    <div id="loginAccountPassErrorSpan" class="error"></div>
+                </div>
+
+                <input type="submit" class="btn med black fleft" value="Connect">
+
+                <div>Don't have an account? <a href="#" onclick="accountCreateLoginToggle('form_accountFormSignin'); return false;">Create
+                        one now.</a></div>
+
+            </form>
+        </div>
+    </div>
+
+
+    <div class="formWrapper" id="form_setupYourStore" style="display:none;">
+
+        <form class="accountForm" method="post" action="<?php echo $adminAjaxUrl; ?>">
+            <input type="hidden" name="form_key" value="<?php echo $formKey  ?>"/>
+            <input type="hidden" name="type" value="userDetails">
+            <input type="hidden" name="tut" value="">
+            <input type="hidden" name="mage_user_id" value="">
+            <input type="hidden" id="mage" name="mage" value="true"/>
+            <input type="hidden" id="websiteMapping" name="website_mapping" value="" />
+
+            <div>
+                <h2>Step 2: Setup your store</h2>
+            </div>
+
+            <div>
+                <label>Store Name</label><br>
+                <input type="text" name="store_name" id="storeName" placeholder="Name your store"
+                       value="<?php echo $storeName; ?>"/>
+
+                <div id="storeNameErrorSpan" class="error"></div>
+            </div>
+
+            <div>
+                <label>Store Description</label><br>
+                <input type="text" name="about_us" id="storeDesc2" placeholder="Tell us a bit about your store" value="test description"/>
+
+                <div id="storeDesc2ErrorSpan" class="error"></div>
+            </div>
+
+            <div>
+                <label>First Name</label><br>
+                <input type="text" name="first_name" id="storeFirstName" placeholder="First name"
+                       value="<?php echo $userFirstname; ?>"/>
+
+                <div id="storeFirstNameErrorSpan" class="error"></div>
+            </div>
+
+            <div>
+                <label>Last Name</label><br>
+                <input type="text" name="last_name" id="storeLastName" placeholder="Last Name"
+                       value="<?php echo $userLastname; ?>"/>
+
+                <div id="storeLastNameErrorSpan" class="error"></div>
+            </div>
+
+            <div>
+                <label>Address Line 1 </label><br>
+                <input type="text" name="street1" id="storeAddress1" placeholder="Address Line 1"
+                       value="1420 s flower st"/>
+
+                <div id="storeAddress1ErrorSpan" class="error"></div>
+            </div>
+
+            <div>
+                <label>Address Line 2</label><br>
+                <input type="text" name="street2" id="storeAddress2" placeholder="Address Line 2 (Optional)"/>
+
+                <div id="storeAddress2ErrorSpan" class="error"></div>
+            </div>
+
+            <div>
+                <label>Zip</label><br>
+                <input type="text" name="zip" id="storeZip" placeholder="Zip" maxlength="5"
+                       value="90003"/>
+
+                <div id="storeZipErrorSpan" class="error"></div>
+            </div>
+
+            <div>
+                <label>City</label><br>
+                <input type="text" name="city" id="storeCity" placeholder="City"
+                       value="los angeles"/>
+
+                <div id="storeCityErrorSpan" class="error"></div>
+            </div>
+
+            <div>
+                <label>Phone</label><br>
+                <input type="text" name="phone" id="storePhone" placeholder="Phone"
+                       value="<?php echo $this->storePhone; ?>"/>
+
+                <div id="storePhoneErrorSpan" class="error"></div>
+            </div>
+
+            <input type="button" class="btn med black fleft"
+                   onclick="return storeSetupFormSubmitted(jQuery(this).parent('form'));" value="Save Store Info">
+        </form>
+    </div>
+
+
+    <div class="formWrapper" id="form_shippingMethod" style="display:none;">
+
+        <form class="accountForm" method="post" action="<?php echo $adminAjaxUrl; ?>">
+            <input type="hidden" name="form_key" value="<?php echo $formKey  ?>"/>
+            <input type="hidden" name="type" value="shippingOption">
+            <input type="hidden" name="tut" value="">
+            <input type="hidden" name="mage_user_id" value="">
+            <input type="hidden" id="mage" name="mage" value="true"/>
+            <input type="hidden" id="websiteMapping" name="website_mapping" value="" />
+            <div>
+                <h2>Step 3: Choose Your Shipping Method</h2>
+            </div>
+
+            <div class="optionContainer">
+                <div><span class="radioContainer"><input type="radio" name="shippingMethod" value="1"
+                                                         id="shippingMethod1"></span><label
+                        for="shippingMethod1" class="optionLabel">Use Your Own Label &amp; Materials</label>
+                </div>
+                <div class="optionSubContainer"><em class="subContentLabel">Perfect When</em> - You've got your
+                    own packaging & shipping solution
+                </div>
+                <div class="optionSubContainer"><em class="subContentLabel">How It Works</em> - You'll submit a
+                    tracking number after you ship an item
+                </div>
+            </div>
+
+            <div id="shippingPriceContainer" style="padding-left:30px;">
+
+                <div class="optionContainer">
+                    <div>
+                                <span class="radioContainer"><input type="radio" name="shippingPriceType" value="perProduct"
+                                                                    id="perProductShipping"></span>
+                        <label for="perProductShipping" class="optionLabel">Flat Rate</label>
+                    </div>
+                    <div class="optionSubContainer">$ <input type="text" style="width:100px;display:inline-block;" value="" name="shippingPerProductAmount" id="shippingPerProductAmount" /></div>
+                </div>
+                <div class="optionContainer">
+                    <div><span class="radioContainer"><input type="radio" name="shippingPriceType" value="percent"
+                                                             id="percentShipping"></span>
+                        <label for="percentShipping" class="optionLabel" name="shippingProductPercent"
+                               id="shippingProductPercent">% Premium </label></div>
+                    <div class="optionSubContainer"><input type="text" style="width:100px;display:inline-block;" value=""
+                                                           name="shippingProductPercentAmount" id="shippingProductPercentAmount"  /> %</div>
+                </div>
+            </div>
+            <div class="optionContainer">
+                <div><span class="radioContainer"><input type="radio" name="shippingMethod" value="2"
+                                                         id="shippingMethod3"></span><label
+                        for="shippingMethod3" class="optionLabel">Free Printable Label</label></div>
+                <div class="optionSubContainer"><em class="subContentLabel">Perfect When</em> - You're set up to
+                    package and ship quickly, but would rather not deal with postage
+                </div>
+                <div class="optionSubContainer"><em class="subContentLabel">How it Works</em> - You'll receive
+                    instructions for printing a prepaid shipping label when your items sell
+                </div>
+            </div>
+
+            <div id="shippingMethodErrorSpan" class="error"></div>
+
+            <input type="button" class="btn med black fleft"
+                   onclick="return shipMethodFormSubmitted(jQuery(this).parent('form'));" value="Continue">
+        </form>
+    </div>
+
+
+    <div class="formWrapper" id="form_itemCategoryMapping" style="display: none;">
+
+        <form class="accountForm" method="post" action="<?php echo $adminAjaxUrl; ?>">
+            <input type="hidden" name="form_key" value="<?php echo $formKey  ?>"/>
+            <input type="hidden" name="type" value="mapCategories">
+            <input type="hidden" name="tut" value="">
+            <input type="hidden" name="mage_user_id" value="">
+            <input type="hidden" id="mage" name="mage" value="true"/>
+            <input type="hidden" name="redirect" value="<?php echo Mage::helper("adminhtml")->getUrl('/tradesy/post') ;  ?>"/>
+            <input type="hidden" id="websiteMapping" name="website_mapping" value="" />
+            <div>
+                <h2>Step 4: Item/Category Mapping</h2>
+            </div>
+            <div id="display_categories" class="master-content">
+                <?php // categories will be received by ajax ?>
+                <?php   //echo $categoryBlock->displayCategories(); ?>
+            </div>
+            <br>
+            <input id="saveMappings" type="button" class="btn med black fleft" onclick="saveMappingsSubmitted(jQuery(this).parent('form'))"
+                   value="Save Mappings">
+        </form>
+    </div>
+
+    </div><!-- end setup-container -->
+    <div class="tradesy-modal">
+        <div class="loader">
+        </div>
+    </div>
+    <script>
+        jQuery.noConflict();
+
+        openLoginContainer("form_accountForm");
+        jQuery( document ).ready(function( $ ) {
+
+
+
+            $("#saveMappings").click(function(){
+                $(".tradesy-modal").slideDown();
+            });
+            protocol = "https%3A%2F%2F";
+            //Image processing
+            function clearPreviewImage(target) {
+                $('#fileChanged').value = true;
+                var file = document.getElementById(target);
+                file.style.backgroundImage = "";
+            }
+
+
+            function loadFile(event, target) {
+                $('#fileChanged').value = true;
+                var file = document.getElementById(target);
+                var imageURL = URL.createObjectURL(event.target.files[0]);
+                file.style.backgroundImage = "url('" + imageURL + "')";
+
+
+                var img = new Image;
+                img.onload = function () {
+                    /* Limit file size
+                     if( parseInt(img.width)>300 || parseInt(img.height)>300 ){
+                     document.getElementById('fileChanged').value = false;
+                     document.getElementById("imagePreviewContainer").style.borderColor = "#E60000";
+                     document.getElementById("shopLogoImg").value= '';
+                     } else {
+                     document.getElementById("imagePreviewContainer").style.borderColor = "#cccccc";
+                     }*/
+                };
+                img.src = imageURL;
+            }
+
+
+
+            jQuery("#shippingPerProductAmount").focus(function (index)
+            {
+                jQuery("#perProductShipping").prop("checked", true);
+                jQuery("#perProductShipping").change();
+            });
+
+            jQuery("#shippingProductPercentAmount").focus(function (index)
+            {
+                jQuery("#percentShipping").prop("checked", true);
+                jQuery("#percentShipping").change();
+            });
+
+
+            jQuery("#shippingPriceContainer input[type='radio']").each(function (index)
+            {
+                jQuery(this).change(function ()
+                {
+                    jQuery( "#shippingPriceContainer .optionContainer").addClass("inactive");
+                    jQuery( "#shippingPriceContainer input[type='text']").prop('disabled', true);
+                    var elem=jQuery(this).parent( ).parent( ).parent(".optionContainer");
+                    elem.removeClass("inactive");
+                    elem.find("input[type='text']").prop('disabled', false);
+                });
+            });
+
+            jQuery("#shippingMethod input[name='shippingMethod']").each(function (index)
+            {
+                jQuery(this).change(function ()
+                {
+                    if (jQuery("input[name='shippingMethod']:checked").val()==1)
+                    {
+                        jQuery("#shippingPriceContainer").slideDown(400);
+                    }
+                    else
+                    {
+                        jQuery("#shippingPriceContainer").slideUp(100);
+                    }
+                });
+
+            });
+
+        });
+
+
+
+    </script>
+<?php else : ?>
+
+    <?php
+    $productTable = Mage::getModel('tradesy_importer/product')->getCollection();
+    $productsConnected = $productTable->addFieldToFilter('tradesy_product_id', array('neq' => 0))->getData();
+
+    $productTableErrors = Mage::getModel('tradesy_importer/product')->getCollection();
+    $errors = $productTableErrors->addFieldToFilter('log',array('like'=>'%Error%'))->getData();
+    ?>
+<div class="tradesy-content">
+    <hgroup>
+        <h1 class="title"><span>Tradesy</span> - Dashboard</h1>
+        <h2 class="short-description">The Marketplace for Luxury Fashion</h2>
+    </hgroup>
+    <div class="master-content">
+        <h2>Products</h2>
+        <div class="block">
+            <h3>Total Products</h3>
+            <?php echo $block->getProductCount(); ?>
+        </div>
+        <div class="block">
+            <h3>Connected to Tradesy</h3>
+            <?php echo count($productsConnected); ?>
+        </div>
+        <div class="block">
+            <h3>Products Failed</h3>
+            <?php echo count($errors); ?>
+        </div>
+        <br>
+        <h2>Orders</h2>
+        <div class="block">
+            <h3>Orders</h3>
+            <?php echo count($orders); ?>
+        </div>
+        <div class="block">
+            <h3>Ernings</h3>
+            $0.00
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+

@@ -18,8 +18,7 @@
 require_once 'abstract.php';
 
 /**
- * Download email data from Campaign Monitor for viewing in the Magento admin panel
- * and purge old email data from Magento database.
+ * Synchronise list subscribers between Campaign Monitor and Magento.
  *
  * To use this script, go to:
  *
@@ -27,10 +26,10 @@ require_once 'abstract.php';
  *
  * and set ``Use Magento cron`` to ``No``.
  *
- * Then add an entry in your Unix crontab to run this script every hour, or use an interval of your choice.
+ * Then add an entry in your Unix crontab to run this script at least once a day.
  *
  */
-class Mage_Shell_Campaignmonitor_Email extends Mage_Shell_Abstract
+class Mage_Shell_Campaignmonitor_List extends Mage_Shell_Abstract
 {
     /**
      * Run script
@@ -40,7 +39,7 @@ class Mage_Shell_Campaignmonitor_Email extends Mage_Shell_Abstract
     {
         /** @var array $tasks */
         $tasks = array();
-        $tasks[] = Mage::getModel('createsend/email_cron');
+        $tasks[] = Mage::getModel('createsend/list_cron');
 
         /** @var Campaignmonitor_Createsend_Model_Cron $task */
         foreach ($tasks as $task) {
@@ -49,5 +48,5 @@ class Mage_Shell_Campaignmonitor_Email extends Mage_Shell_Abstract
     }
 }
 
-$shell = new Mage_Shell_Campaignmonitor_Email();
+$shell = new Mage_Shell_Campaignmonitor_List();
 $shell->run();

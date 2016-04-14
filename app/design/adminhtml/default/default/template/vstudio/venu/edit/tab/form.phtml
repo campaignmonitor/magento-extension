@@ -1,0 +1,327 @@
+<?php
+    $_menuData = $this->_getVenuData();
+     // get values as variables
+    extract($_menuData);
+?>
+<div class="entry-edit">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend">Menu  information</h4>
+        <div class="form-buttons"></div>
+    </div>
+    <div id="menu_edit_form" class="fieldset ">
+        <div class="hor-scroll">
+            <table cellspacing="0" class="form-list">
+                <tbody>
+                <tr>
+                    <td class="label"><label for="menu_title">Menu Title <span class="required">*</span></label></td>
+                    <td class="value">
+                        <input type="text" class="required-entry input-text required-entry" <?php echo (isset($menu_title) && !empty($menu_title)) ? 'value="' . $menu_title . '"' : ''; ?> name="menu_title" id="menu_title">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="menu_orientation">Menu Orientation</label></td>
+                    <td class="value">
+                        <select class=" select" name="menu_options[menu_orientation]" id="menu_orientation">
+                            <option <?php echo (isset($menu_orientation) && $menu_orientation == 'horz')? 'selected="selected"' : ''; ?> value="horz">Horizontal</option>
+                            <option <?php echo (isset($menu_orientation) && $menu_orientation == 'vert')? 'selected="selected"' : ''; ?> value="vert">Vertical</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="menu_status">Status</label></td>
+                    <td class="value">
+                        <select class=" select" name="menu_status" id="menu_status">
+                            <option <?php echo (isset($menu_status) && $menu_status == 1)? 'selected="selected"' : ''; ?> value="1">Active</option>
+                            <option <?php echo (isset($menu_status) && $menu_status == 0)? 'selected="selected"' : ''; ?> value="0">Non Active</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="hidden" colspan="2"><input type="hidden" value="" name="" id="advance_options">
+                        <button id="hide_advance" title="Edit Menu Item" type="button" class="scalable save">
+                            <span><span><span>Show Advance Options</span></span></span></button>
+                        <script>
+                            document.observe("dom:loaded", function() {
+                               $$('.advance-options').invoke('up').invoke('up').invoke('hide');
+                                $('hide_advance').observe('click', function(event) {
+                                    $$('.advance-options').invoke('up').invoke('up').invoke('toggle');
+                                   });
+                            });
+                        </script></td>
+                </tr>
+                <tr style="display: none;">
+                    <td class="label"><label for="menu_css_id">Menu CSS Id</label></td>
+                    <td class="value">
+                        <input type="text" class="advance-options input-text" value="<?php echo (isset($menu_css_id)) ? $menu_css_id : ''; ?>" name="menu_options[menu_css_id]" id="menu_css_id">
+                        <p class="note"><span>The ID that is applied to the ul element which encloses the menu items.</span></p>
+                    </td>
+                </tr>
+                <tr style="display: none;">
+                    <td class="label"><label for="menu_css_class">Menu CSS Class</label></td>
+                    <td class="value">
+                        <input type="text" class="advance-options input-text" value="<?php echo (isset($menu_css_class)) ? $menu_css_class : ''; ?>" name="menu_options[menu_css_class]" id="menu_css_class">
+                        <p class="note"><span>The class that is applied to the ul element which encloses the menu items.</span></p>
+                    </td>
+                </tr>
+                <tr style="display: none;">
+                    <td class="label"><label for="container_id">Menu container id</label></td>
+                    <td class="value">
+                        <input type="text" class="advance-options input-text" value="<?php echo (isset($container_id)) ? $container_id : ''; ?>" name="menu_options[container_id]" id="container_id">
+                        <p class="note"><span>The css id that is applied to the container</span></p>
+                    </td>
+                </tr>
+                <tr style="display: none;">
+                    <td class="label"><label for="container_class">Menu container class</label></td>
+                    <td class="value">
+                        <input type="text" class="advance-options input-text" value="<?php echo (isset($contaner_class)) ? $contaner_class : ''; ?>" name="menu_options[container_class]" id="container_class">
+                        <p class="note"><span>The css class that is applied to the container</span></p>
+                    </td>
+                </tr>
+                <tr style="display: none;">
+                    <td class="label"><label for="menu_container">Menu Container</label></td>
+                    <td class="value">
+                        <select onchange="" onclick="" class="advance-options select" name="menu_options[menu_container]" id="menu_container">
+                            <option <?php echo (isset($menu_container) && $menu_container == 'nav') ? 'selected="selected"' : ''; ?> value="nav">Use a nav</option>
+                            <option <?php echo (isset($menu_container) && $menu_container == 'div') ? 'selected="selected"' : ''; ?> value="div">Use a div</option>
+                            <option <?php echo (isset($menu_container) && $menu_container == 'none') ? 'selected="selected"' : ''; ?> value="none">Use nothing</option>
+                        </select>
+                        <p class="note"><span>Whether to wrap the ul, You can use div and nav tags</span></p>
+                    </td>
+                </tr>
+                <?php if (!empty($menu_code)) : ?>
+                    <tr>
+                        <td class="label"><label for="menu_code">Menu Code</label></td>
+                        <td class="value">
+                        
+                            <textarea class=" textarea" cols="15" rows="2" onclick="this.select();" name="menu_code" id="menu_code"><?php echo (!empty($menu_code))? $menu_code : ''; ?></textarea>
+                            <p class="note">
+                                <span style="width:100%; color:red;">
+										     Use this to add this menu into pages,
+										     category pages or static blocks
+                                </span></p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+           </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="entry-edit">
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend">Menu</h4>
+        <div class="form-bottuns"></div>
+    </div>
+    <div class="fieldset">
+        <div class="hor-scroll">
+            <?php
+                
+                function createMenuPreview($items = array(), $parent = 0, $isChild = false)
+                {   
+                    if (!empty($items[$parent])) {
+                        
+                       
+                        $i = 0;
+                         echo ($isChild) ? '<ul class="venu-menu-sub">' : '<ul id="menu_venu" class="venu-menu">';
+                        foreach ($items[$parent] as $item) {
+                            $id = $item['id'];
+                            $title = $item['item_label'];
+                            $link = urldecode($item['item_link']);
+                            $order = $item['sort_order'];
+                            echo "<li id='$id' class='venu-item'>";
+                            echo '<button name="delete_'.$id.'" onclick="javascript:deleteMenuItem('.$id.'); return false;">Delete</button>';
+                            echo '<h4 class="toggler" > ID: '. $id . ' ' . $title . ' </h4><br><div class="panel">';
+                            echo '<label>Menu Title</label><br>';
+                            echo '<input type="text" class=" input-text" value="'.$title.'" name="item['.$id.'][item_label]"><br>';
+                            echo '<label>Menu Link</label><br>';
+                            echo '<input type="text" class=" input-text" value="'.$link.'" name="item['.$id.'][item_link]"><br>';
+                            echo '<label>Menu Order ';
+                            echo '<input type="text" class=" input-text" style="width:28.5%;" value="'.$order.'" name="item['.$id.'][sort_order]" id="sort_order_'.$id.'"></label>';
+                            echo '<label>Menu Parent ';
+                            echo '<input type="text" class=" input-text" style="width:29%;" value="'.$parent.'" name="item['.$id.'][parent_id]" id="parent_id_'.$id.'"></lable>';
+                            echo '<input type="hidden" value="'.$id.'" name="item['.$id.'][id]">';
+                            echo '</div><span  class="venu-menu-sub"><h5>Drop sub items here</h5>';
+                                createMenuPreview($items, $item['id'], true);
+                            echo '</span>';
+                            echo "</li>";
+                        }
+                        echo "</ul>";
+                    }
+                }
+                
+                if ( isset($menu_items) && !empty($menu_items) ) {
+                     $items = array();
+                    foreach ($menu_items as $item) {
+                        $items[$item['parent_id']][] = $item;
+                    }
+                   createMenuPreview($items);
+                }
+            ?>
+ <script>
+   
+   var menu = document.getElementById("menu_venu");
+   var togglers = menu.getElementsByTagName("h4");
+   $$("div.panel").each(function(item){
+        $(item).toggle(true);
+    });
+   $A($(togglers)).each(function(item) {
+      $(item).observe('click', function(event) {
+          panel = item.next('div');
+          $(panel).toggle();
+       });
+   });
+
+     function ajaxDelete(id) { 
+            url = '<?php echo Mage::helper("adminhtml")->getUrl('/venu_menu/ajax') ?>';
+            new Ajax.Request(url, {
+                type: "POST",
+                parameters: "deleteItem="+id,
+                asynchronous: true,
+                onFailure: function(transport) {
+                    var text = transport.responseText;
+                    var JSON = eval( "(" + text + ")" );
+                    updateStatus(JSON.code + ": " + JSON.message);
+                },
+                onSuccess: function(transport) {
+                    var menu = document.getElementById("menu_venu");
+                    var items = menu.getElementsByTagName('li');
+                    
+                    for ( var i = 0; i < items.length; i++ ) {
+                        if ( items[i].getAttribute('id') == id ) {
+                              console.log(items[i]);
+                              items[i].remove();
+                        }
+                    }
+                   
+                    if (200 == transport.status) {
+                        console.log("sucess: " + transport.responseText);
+                        createPlaceholder();
+                        new Effect.Highlight("menu_venu", { startcolor: '#F7C8C8', endcolor: '#ffffff' });
+                    
+                    } else {
+                        console.log("something wente wrong: " + transport.status);
+                    }
+                    
+                    
+                 }
+            });
+           
+     }
+
+     function deleteMenuItem(id) {
+     if ( confirm("do you really want to delete this menu item?") ) {
+        var menu = document.getElementById("menu_venu");
+        var items = menu.childNodes;
+        for ( var i = 0; i < items.length; i++ ) {
+            if ( items[i].getAttribute('id') == id ) {
+                var subItems = items[i].getElementsByTagName('li');
+                if ( subItems.length > 0 ) {
+                    for (var j = 0; j < subItems.length; j++) {
+                       var subId = subItems[j].getAttribute('id');
+                        if (typeof subId !== 'undefined' && subId !== null)
+                                ajaxDelete(subId);
+                    }                  
+                } 
+            }
+        }
+        ajaxDelete(id);
+       }
+     }
+     var subMenus = $('menu_venu').getElementsByTagName('ul');
+     
+     function createPlaceholder(){
+         var droppers = $('menu_venu').getElementsByTagName('span');
+         $A(droppers).each( function(item) {
+            var uls = item.getElementsByTagName("ul");
+            
+
+            if ( !(uls.length > 0) ) {
+                item.insert("<ul><li class='placeholder'>&nbsp;</li></ul>");
+            } else {
+                var children = uls[0].getElementsByTagName("li");
+                
+                if ( !(children.length > 0) )
+                    uls[0].insert("<li class='placeholder'>&nbsp;</li>");
+            }
+         });
+     }
+
+     createPlaceholder();
+
+     $A(subMenus).each( function (item) {
+     Sortable.create(item, {
+         tree: true,
+         treeTag: 'ul',
+         onChange: subMenuUpdate
+         
+     });
+    });
+
+     Sortable.create("menu_venu", {
+         tree: true,
+         treeTag: 'ul',
+         onChange: update
+     });
+
+     function update() {
+         var elements = document.getElementById("menu_venu").childNodes;
+         // set the order of the elements after they have been moved
+         for (var i = 0; i < elements.length; i++) {
+             var id = elements[i].getAttribute('id');
+             var parent = elements[i].up();
+             var Order = elements[i].select('input[id="sort_order_' + id + '"]');
+             var parentId = elements[i].select('input[id="parent_id_' + id + '"]');
+             if (!(typeof parent === 'undefined')) {
+                 parentId[0].value = 0;
+             }
+             Order[0].value = i;
+         }
+     createPlaceholder();
+     }
+     function subMenuUpdate(item) {
+        var itemParent = item.up('ul').up('li');
+        var parentId = (typeof itemParent !== 'undefined') ? itemParent.getAttribute('id') : 0;
+        var itemId = item.getAttribute('id');
+        var  inputParent = item.select('input[id="parent_id_' + itemId + '"]');
+        
+        // assign parent id to this item
+        inputParent[0].value = parentId;
+
+        var elements = item.up('ul').childNodes;
+            
+         // set the order of the elements after they have been moved
+        for (var i = 0; i < elements.length; i++) {
+             var id = elements[i].getAttribute('id');  
+            if (typeof id !== 'undefined' && id !== null) {       
+                var elementOrder =  elements[i].select('input[id="sort_order_' + id + '"]');
+                elementOrder[0].value = i;
+            }
+        }
+        
+        createPlaceholder();
+        
+     }
+
+   /*  var spans = $('menu_venu').getElementsByTagName('ul');
+     $A(spans).each( function (item) {
+        Droppables.add( item,   {
+            hoverclass: 'hoverActive',
+             onDrop: moveItem
+            }
+        );
+    });
+
+     function moveItem(draggable, droparea) {
+         droparea.appendChild(draggable);
+         var parent = draggable.up('li');
+         var id = draggable.getAttribute('id');
+         var parentId = parent.getAttribute('id');
+         var input = parent.select('input[id="parent_id_' + id + '"]');
+         input[0].value = parentId;
+     }*/
+</script>
+</div>
+</div>
+
+</div>
