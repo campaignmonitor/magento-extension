@@ -1,0 +1,566 @@
+<?php
+
+$block = $this;
+$currentUser = Mage::getModel('tradesy_importer/user')->getCurrent();
+$userId = $currentUser->getId();
+$settings = Mage::getModel('tradesy_importer/setting')->getUserSettings($userId);
+
+
+
+$userToken = "";
+$adminAjaxUrl = $this->helper->getAjaxUrl();
+$data = Mage::getSingleton('tradesy_importer/tradesy');
+$flatRate = $data->getFlatRate($userId);
+$premium = $data->getPremium($userId);
+$userToken = $data->getUserToken($userId);
+$shippingMethod = $data->getUserShippingMethod($userId);
+$profileImageRealUrl = $data->getProfileImage($userId);
+
+
+$profileImageUrl = pathinfo($profileImageRealUrl);
+
+$profileImage =  Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . $profileImageUrl['basename'];
+
+
+$websiteId = $data->getWebsiteId();
+
+$tradesyBlock = $this->getLayout()->createBlock('tradesy_importer/adminhtml_tradesy')->setBlockId('tradesy_block');
+
+$categories = array();
+$websiteId = 0;
+
+$formKey = Mage::getSingleton('core/session')->getFormKey();
+$productsToSend = array();
+
+$userDetails = Mage::getModel('tradesy_importer/user_details')->load($userId);
+extract($userDetails->getData());
+
+?>
+
+<?php  if ($this->helper->isUserConnected()) : ?>
+<div class="tradesy-content">
+    <hgroup>
+        <h1 class="title"><span>Tradesy</span> - Preferences</h1>
+        <h2 class="short-description">The Marketplace for Luxury Fashion</h2>
+    </hgroup>
+    <div class="twoColContainer">
+        <div class="colNav">
+            <ul class="dashboard_sidebar">
+                <li><a href="#" id="accountInfoLink" onclick="openContainer('accountInfo');return false;">Tradesy Account
+                        Info</a></li>
+                <li><a href="#" id="shippingMethodLink" onclick="openContainer('shippingMethod');return false;">Shipping
+                        Method</a></li>
+                <li><a href="#" id="removeAccountLink" onclick="openContainer('removeAccount');return false;">Remove
+                        Account</a></li>
+                <li><a href="#" id="unlinkAccountLink" onclick="openContainer('unlinkAccount');return false;">Unlink
+                        Account</a></li>
+                <!--<li><a href="#" id="relinkAccountLink" onclick="openContainer('relinkAccount');return false;">Relink
+                        Account</a></li> -->
+                <li><a href="#" id="categoryMappingLink" onclick="openContainer('categoryMapping');return false;">Category
+                        Mapping</a></li>
+                <li><a href="#" id="itemPropertyMappingLink" onclick="openContainer('itemPropertyMapping');return false;">Item
+                        Property Mapping</a></li>
+            </ul>
+        </div>
+        <div class="colContent">
+            <div id="accountInfo" class="formWrapper" style="display:none; max-width: 500px">
+                    <div>
+                        <h2>Tradesy Account Info</h2>
+                    </div>
+                <form id="userImageForm" method="post" enctype="multipart/form-data" action="<?php echo Mage::helper("adminhtml")->getUrl('/tradesy/upload'); ?>">
+               <input type="hidden" name="form_key" value="<?php echo $formKey  ?>"/>
+               <input type="hidden" name="type" value="updateimage"/>
+               <input type="hidden" name="tut" value="<?php echo $userToken; ?>"/>
+                    <div>
+                        <label>Profile Image</label><br>
+                        <div class="imagePreviewContainer" id="imagePreviewContainer">
+                            <div class="imagePreview" id="profileImagePreview" style="background-size:contain;">
+                            <img style="width:100%;" src="<?php echo $profileImage; ?>" alt="Profile Image"/>
+</div>
+                        </div>
+                        <input type="file" accept="image/*" name="fileToUpload" id="profileImage"  onchange="javascript:this.form.submit();"/>
+                       <!-- <input type="button" class="imagePreviewBtn" value="Clear Image" name="clearImage" id="clearImage">-->
+                    </div>
+                    </form>
+                <form id="userDetailsForm" method="post" action="">
+
+                    <input type="hidden" name="type" value="userDetails">
+                    <input type="hidden" name="tut" value="<?php echo $userToken; ?>">
+
+
+
+
+                    <div id="">
+                        <label>Email</label><br>
+                        <input type="text" name="email" id="email" placeholder="Email"
+                               value="<?php echo (isset($email)) ? $email : ""; ?>" readonly style="background-color: rgba(221,221,221,1);"/>
+                        <div id="nameErrorSpan" class="error"></div>
+                    </div>
+
+                    <div id="">
+                        <label>Store Name</label><br>
+                        <input type="text" name="store_name" id="store_name" placeholder="Name your store"
+                               value="<?php echo (isset($store_name)) ? $store_name : ""; ?>" />
+                        <div id="nameErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>Store Description</label><br>
+                        <input type="text" name="about_us" id="about_us" placeholder="Tell us a bit about your store"
+                               value="<?php echo (isset($store_description)) ? $store_description : ""; ?>"/>
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>First Name</label><br>
+                        <input type="text" name="first_name" id="first_name" placeholder="First name"
+                               value="<?php echo (isset($full_name)) ? $full_name : ""; ?>"/>
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>Last Name</label><br>
+                        <input type="text" name="last_name" id="last_name" placeholder="Last Name"
+                               value="<?php echo (isset($last_name)) ? $last_name : ""; ?>">
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>Address Line 1 </label><br>
+                        <input type="text" name="street1" id="street1" placeholder="Address Line 1"
+                               value="<?php echo (isset($address_primary)) ? $address_primary : ""; ?>">
+
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>Address Line 2</label><br>
+                        <input type="text" name="street2" id="street2" placeholder="Address Line 2 (Optional)"
+                               value="<?php echo (isset($address_secondary)) ? $address_secondary : ""; ?>">
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>Zip</label><br>
+                        <input type="text" name="zip" id="zip" placeholder="Zip"
+                               value="<?php echo (isset($zip_code)) ? $zip_code : ""; ?>">
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>City</label><br>
+                        <input type="text" name="city" id="city" placeholder="City"
+                               value="<?php echo (isset($city)) ? $city : ""; ?>">
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>State</label><br>
+                        <input type="text" name="state" id="state" placeholder="State"
+                               value="<?php echo (isset($state)) ? $state : ""; ?>">
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div>
+                        <label>Phone</label><br>
+                        <input type="text" name="phone" id="phone" placeholder="Phone"
+                               value="<?php echo (isset($phone)) ? $phone : ""; ?>">
+                        <div id="emailErrorSpan" class="error"></div>
+                    </div>
+
+                    <div class="form_footer">
+                        <input type="button" name="submitFormBtn" class="btn med black fleft" id="updateAccountBtn"
+                               value="Update Account Info">
+                    </div>
+                </form>
+            </div>
+
+
+            <div id="shippingMethod" class="formWrapper" style="display:none;">
+
+                <form id="shippingMethodForm" action="<?php echo $adminAjaxUrl; ?>" method="post" enctype="multipart/form-data">
+
+                    <input type="hidden" name="type" value="shippingOption">
+                    <input type="hidden" name="tut" value="<?php echo $userToken; ?>">
+
+                    <div><h2>Shipping Method</h2></div>
+
+                    <div class="optionContainer">
+                        <div><span class="radioContainer">
+
+                        <input type="radio" name="shippingMethod" value="1" id="shippingMethod1" <?php echo ($shippingMethod == 1) ? "checked" : ""; ?>>
+
+
+                        </span><label for="shippingMethod1" class="optionLabel">Use Your Own Label &amp; Materials</label>
+                        </div>
+                        <div class="optionSubContainer"><em class="subContentLabel">Perfect When</em> - You've got your
+                            own packaging & shipping solution
+                        </div>
+                        <div class="optionSubContainer"><em class="subContentLabel">How It Works</em> - You'll submit a
+                            tracking number after you ship an item
+                        </div>
+                    </div>
+
+                    <div id="shippingPriceContainer" style="padding-left:30px;">
+
+                        <div class="optionContainer">
+                            <div>
+                                <span class="radioContainer">
+                                <?php if ($flatRate > 0) : ?>
+                                 <input type="radio" name="shippingPriceType" value="perProduct" id="perProductShipping" checked>
+                                <?php else : ?>
+                                 <input type="radio" name="shippingPriceType" value="perProduct" id="perProductShipping">
+                                <?php endif; ?>
+
+                                </span>
+                                <label for="perProductShipping" class="optionLabel">Flat Rate</label>
+                                </div>
+                            <div class="optionSubContainer">$ <input type="text" style="width:100px;display:inline-block;" value="<?php echo $flatRate; ?>" name="shippingPerProductAmount" id="shippingPerProductAmount" /></div>
+                        </div>
+                        <div class="optionContainer">
+                            <div><span class="radioContainer">
+                            
+                            <input type="radio" name="shippingPriceType" value="percent" id="percentShipping">
+
+                            </span>
+                                <label for="percentShipping" class="optionLabel" name="shippingProductPercent"
+                                         id="shippingProductPercent">% Premium </label>
+
+                                         </div>
+                            <div class="optionSubContainer">
+
+                            <?php if ($premium > 0) : ?>
+                            <input type="text" style="width:100px;display:inline-block;" value="<?php echo $premium; ?>"
+                                                                   name="shippingProductPercentAmount" id="shippingProductPercentAmount"  checked/>
+                            <?php else : ?>
+                            <input type="text" style="width:100px;display:inline-block;" value=""
+                                                                   name="shippingProductPercentAmount" id="shippingProductPercentAmount"  />
+                            <?php endif; ?>
+
+                                                                    %</div>
+                        </div>
+                    </div>
+                    <div class="optionContainer">
+                        <div><span class="radioContainer">
+
+                            <input type="radio" name="shippingMethod" value="2" id="shippingMethod3" <?php echo ($shippingMethod == 2) ? "checked" : ""; ?> />
+
+                                                                 </span><label
+                                for="shippingMethod3" class="optionLabel">Free Printable Label</label></div>
+                        <div class="optionSubContainer"><em class="subContentLabel">Perfect When</em> - You're set up to
+                            package and ship quickly, but would rather not deal with postage
+                        </div>
+                        <div class="optionSubContainer"><em class="subContentLabel">How it Works</em> - You'll receive
+                            instructions for printing a prepaid shipping label when your items sell
+                        </div>
+                    </div>
+
+                    <div class="form_footer">
+                        <input type="button" name="shippingMethodBtn" id="shippingMethodBtn" value="Save" class="btn med black fleft">
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <div id="removeAccount" class="formWrapper" style="display:none;">
+
+                <form method="post" action="">
+                    <input type="hidden" name="type" value="removeAccount">
+                    <input type="hidden" name="tut" value="">
+                    <div><h2>Remove Account</h2></div>
+                    <div class="optionSubContainer">Remove your Tradesy account and all related items</div>
+                </form>
+
+            </div>
+
+
+            <div id="unlinkAccount" class="formWrapper" style="display:none;">
+
+        <form id="unlinkAccountForm" method="post"  action="<?php echo Mage::helper("adminhtml")->getUrl('/tradesy/unlink'); ?>">
+
+               <input type="hidden" name="form_key" value="<?php echo $formKey  ?>"/>
+                    <input type="hidden" name="type" value="unlinkAccount"/>
+
+ <input type="hidden" name="tut" value="<?php echo $userToken; ?>"/>
+
+                    <div><h2>Unlink Account</h2></div>
+                    <div class="optionSubContainer">Unlink your Shopify account from your Tradesy account. All Tradesy
+                        items will be retained
+                    </div>
+                    <div class="form_footer">
+                    <input type="submit" name="submitFormBtn" value="Unlink"
+                                                    class="btn med black fleft" style="background-color:#B00;">
+                                                    </div>
+                </form>
+
+            </div>
+
+            <div id="relinkAccount" class="formWrapper" style="display:none;">
+
+                <form method="post" action="">
+
+                    <input type="hidden" name="type" value="relinkAccount">
+                    <input type="hidden" name="tut" value="">
+                    <div><h2>Relink Account</h2></div>
+                    <div class="optionSubContainer">Connect your Shopify account to your Tradesy account</div>
+
+                </form>
+
+            </div>
+
+
+            <div id="categoryMapping" class="formWrapper" style="display:none;">
+
+                <form method="post" action="">
+
+                    <input type="hidden" name="type" value="mapCategories">
+                    <input type="hidden" name="tut" value="">
+                    <?php echo  $tradesyBlock->getMappedCategoriesHTML(true); ?>
+
+                       <?php  // echo  $this->getLayout()->createBlock('tradesy_importer/adminhtml_mapper')->displayCategories(); ?>
+
+                </form>
+
+            </div>
+
+
+            <div id="productTypeMapping" class="formWrapper" style="display:none;">
+
+                <form method="post" action="">
+
+                    <input type="hidden" name="type" value="mapProductTypes">
+                    <input type="hidden" name="tut" value="">
+
+                    <div><h2>Product Type Mapping</h2></div>
+
+
+
+                    <div class="form_footer"><input type="button" name="submitFormBtn" value="Save"
+                                                    class="btn med black fleft"></div>
+                </form>
+            </div>
+
+            <div id="itemPropertyMapping" class="formWrapper" style="display:none;">
+
+                    <input type="hidden" name="type" value="itemPropertyMapping">
+                    <input type="hidden" name="tut" value="">
+                    <?php echo  $tradesyBlock->getMappedPropertiesHTML(); ?>
+
+            </div>
+
+
+        </div>
+
+        <div style="margin-bottom:100px;"></div>
+    </div>
+
+</div>
+
+</div>
+
+
+    <div class="tradesy-modal">
+        <div class="loader">
+        </div>
+    </div>
+
+    <script>
+        jQuery.noConflict();
+        jQuery( document ).ready(function( $ ) {
+
+        openContainer("accountInfo");
+
+        $("#mapProperties").submit(function(e){
+            e.preventDefault();
+            $(".tradesy-modal").slideDown();
+
+               var dataToSend = $(this).serialize();
+  
+             $.ajax({
+                    type: "POST",
+                    url: "<?php echo $adminAjaxUrl; ?>",
+                    data: dataToSend,
+                    success: function(data, textStatus, request){
+                        console.log(data);
+                        //location.reload();
+                        $(".tradesy-modal").slideUp();
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                    }
+                });
+        });
+
+        $("#updateAccountBtn").click(function(e){
+            e.preventDefault();
+
+               var dataToSend = $("#userDetailsForm").serialize();
+               dataToSend += "&form_key=" + encodeURIComponent("<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>");
+
+               $.ajax({
+                    type: "POST",
+                    url: "<?php echo $adminAjaxUrl; ?>",
+                    data: dataToSend,
+                    success: function(data, textStatus, request){
+                        console.log(data);
+
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                    }
+                });
+        });
+
+        $("#shippingMethodBtn").click(function(e){
+        e.preventDefault();
+
+        var dataToSend = $("#shippingMethodForm").serialize();
+        dataToSend += "&form_key=" + encodeURIComponent("<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>");
+               $.ajax({
+                    type: "POST",
+                    url: "<?php echo $adminAjaxUrl; ?>",
+                    data: dataToSend,
+                    success: function(data, textStatus, request){
+                        console.log(data);
+
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                    }
+                });
+        });
+
+            $("#savepreferences").click(function(){
+                alert("test");
+            });
+
+            $(".tradesy-categories-select").change(function(e){
+
+                e.preventDefault();
+                console.log($(this).val());
+
+                var dataToSend = $(this).serialize();
+                dataToSend += "&form_key=" + encodeURIComponent("<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>");
+                dataToSend += "&type=" + encodeURIComponent("remap_category");
+                $(".tradesy-modal").slideDown();
+                $.ajax({
+                    type: "POST",
+                    url: "<?php echo $adminAjaxUrl; ?>",
+                    data: dataToSend,
+                    success: function(data, textStatus, request){
+                        console.log(data);
+                        //location.reload();
+                        $(".tradesy-modal").slideUp();
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                    }
+                });
+
+            });
+
+            // each category name contains magento category "id" and the tradesy "map" id
+            $(".category-name").each(function(){
+                var id = $(this).data('id');
+                var mappedTo = $(this).data('map');
+                
+                var parent = $(this).parents('tr');
+                parent.find('.tradesy-categories-select').attr('name', 'map[' + id + '][tradesy_category]');
+                parent.find('.tradesy-categories-select option[value='+mappedTo+']').prop('selected', true);
+
+            });
+
+            $("#savePreferencesForm").submit(function(event) {
+                event.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "<?php echo $adminAjaxUrl; ?>",
+                    data: $(this).serialize(),
+                    success: function(data, textStatus, request){
+                        console.log(data);
+
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                    }
+                });
+            });
+
+
+
+            $("#category_remapper .tradesy-cat-title").click(function(){
+               var list = $(this).siblings('.attribute-list');
+
+                if (list.is(':visible')){
+                    list.hide();
+                } else {
+                    list.show();
+                }
+            });
+
+            $( "select.tradesy-properties" ).change(function() {
+                var str =  $(this).val();
+                $(this).attr('id', 'property_changer');
+
+                if (str.trim()){
+                    console.log(str);
+
+
+                    jQuery.ajax({
+                        type: "POST",
+                        url: "<?php echo $adminAjaxUrl; ?>",
+                        data: { category_code: str,
+                                type: "getCategoryValues",
+                                form_key: "<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+                        },
+                        success: function(data, textStatus, request){
+                            var obj = jQuery.parseJSON(data);
+
+                            var parent = $('#property_changer').parents('li');
+
+                            $.each(obj, function(index, values) {
+                                if (index == 'options'){
+                                    if (values == '') {
+                                        parent.children('.attr-options').children().each(function(index, element){
+                                            $(element).children('select').remove();
+                                            $(element).children('input').remove('input[type="text"]');
+                                            var name = $(element).children('input').attr('name');
+                                            $(element).append('<input type="text" value=""  name="' + name + '"/>');
+                                        });
+                                    } else {
+                                        parent.children('.attr-options').children().each(function(index, element){
+                                            // remove inputs if they previously selected an attribute that has input fields
+                                            $(element).children('input').remove('input[type="text"]');
+                                            $(element).children('select').remove();
+                                            // grab the name from the hidden field which containe the category id, attribute code and value to map
+                                            var name = $(element).children('input').attr('name');
+                                           // $(element).children('input').removeAttr('name');
+                                            $(element).append('<select name="' + name + '">' + values + '</select>');
+                                        });
+                                    }
+                                }
+                            });
+
+                            $('#property_changer').removeAttr('id');
+
+                        },
+
+                        error: function (request, textStatus, errorThrown) {
+                        }
+                    });
+                }
+
+            });
+
+            <?php foreach ($categories as $id => $map ) : ?>
+            <?php if ($map == 'Do not send') : ?>
+            jQuery(".mapped-categories select[name='map[<?php echo $id; ?>]']").replaceWith("Do not send");
+            <?php else : ?>
+            jQuery(".mapped-categories select[name='map[<?php echo $id; ?>]']").replaceWith(jQuery(".mapped-categories select[name='map[<?php echo $id ?>]'] option[value='<?php echo $map ?>']"));
+            <?php endif; ?>
+
+            <?php endforeach; ?>
+
+
+        });
+    </script>
+<?php endif; ?>
+
+

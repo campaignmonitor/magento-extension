@@ -169,6 +169,8 @@ class Campaignmonitor_Createsend_Helper_Api extends Mage_Core_Helper_Abstract
         /** @var Mage_Newsletter_Model_Subscriber $subscribers */
         $subscribers = Mage::getModel('newsletter/subscriber');
 
+
+
         $collection = $subscribers->getCollection()
             ->addFieldToFilter('store_id', $storeId)
             ->addFieldToFilter('subscriber_status', Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
@@ -177,6 +179,8 @@ class Campaignmonitor_Createsend_Helper_Api extends Mage_Core_Helper_Abstract
         foreach ($collection as $subscriber) {
             $email = $subscriber->getSubscriberEmail();
 
+            $subscriberData['Name'] = "";
+            $subscriberData['CustomFields'] = array();
             $subscriberData['EmailAddress'] = $email;
 
             $websiteId = Mage::app()->getStore($subscriber->getStoreId())->getWebsiteId();
@@ -188,10 +192,13 @@ class Campaignmonitor_Createsend_Helper_Api extends Mage_Core_Helper_Abstract
 
             if ($customer->getId()) {
                 $subscriberData['Name'] = $customer->getName();
+
+                $subscriberData['CustomFields'] =
+                    Campaignmonitor_Createsend_Model_Customer_Observer::generateCustomFields($customer);
+
             }
 
-            $subscriberData['CustomFields'] =
-                    Campaignmonitor_Createsend_Model_Customer_Observer::generateCustomFields($customer);
+
 
             $listData[] = $subscriberData;
         }

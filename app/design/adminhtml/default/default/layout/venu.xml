@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Villagran Studio
+* @category   Vstudio
+* @package    Vstudio_Venu
+* @copyright  Copyright (c) 2010-2011 villagran Studio. (http://www.villagranstudio.com)
+* @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*/
+-->
+<layout version="1.0.0">
+	<adminhtml_venu_menu_index>
+		<reference name="content">
+			<block type="vstudio_venu/adminhtml_menumanager" name="manage.menu.grid" />
+		</reference>
+	</adminhtml_venu_menu_index>
+	<adminhtml_venu_menu_edit>
+		<reference name="content">
+			<block type="vstudio_venu/adminhtml_menumanager_edit" name="manage.menu.edit.grid" />
+		</reference>
+        <reference name="head">
+            <action method="addCss"><name>vstudio/venu/venu.css</name></action>
+        </reference>
+	</adminhtml_venu_menu_edit>
+	<adminhtml_venu_menu_categories>
+		<block type="core/text_list" name="root" output="toHtml">
+			<block type="vstudio_venu/adminhtml_menumanager_edit_tab_categories" name="manage.menu.edit.tab.categories"/>
+		</block>
+	</adminhtml_venu_menu_categories>
+</layout>
+

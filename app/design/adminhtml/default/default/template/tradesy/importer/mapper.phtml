@@ -1,0 +1,322 @@
+<?php
+
+
+$block = $this;
+$currentUser = Mage::getModel('tradesy_importer/user')->getCurrent();
+$userId = $currentUser->getId();
+$settings = Mage::getModel('tradesy_importer/setting')->getUserSettings($userId);
+
+$data = Mage::getSingleton('tradesy_importer/tradesy');
+$userToken = $data->getUserToken();
+$websiteId = 0;
+$websiteId = $data->getWebsiteId();
+$chosenStoreName = $data->getChosenStoreName();
+$exportFlag = $data->getExportFlag();
+$currentPage = $data->getCurrentPage();
+$process = Mage::helper('tradesy_importer/process');
+
+
+
+/*
+$args = array('tut' => $userToken);
+$orders = $process->processOrders($args);
+
+
+$item = $process->getTradesyProduct('1396', $userToken);
+echo "<pre>";
+print_r($item);
+echo "</pre>";
+
+$category = Mage::getModel('catalog/category');
+$tree = $category->getTreeModel();
+$tree->load();
+$ids = $tree->getCollection()->getAllIds();
+
+echo "<pre>";
+print_r(array_rand($ids));
+echo "</pre>";
+*/
+//$process->createTradesyProducts(array('quantity' => 58), 843, 1393);
+
+
+$adminAjaxUrl = $this->helper->getAjaxUrl();
+$categoryTable = Mage::getModel('tradesy_importer/category');
+$categoryRows = $categoryTable->getMappedCategories(1);
+$categoryMappedCount = $categoryTable->getMappedCategoriesCount();
+
+$productsToSend = array();
+$productToSendCount = 0;
+
+$categories = array();
+
+
+
+//$orders = Mage::getModel('sales/order')->getCollection()->addFieldToFilter('increment_id', '000000051-1');
+
+//$data->processShipment('000000048-1');
+
+//$data->exportProducts();
+
+
+
+// get product mapped products
+$productTable = Mage::getModel('tradesy_importer/product')->getCollection();
+$sentProductCount = count($productTable);
+
+$exportResults = $productTable->getData();
+
+
+$setting = Mage::getModel('tradesy_importer/setting');
+$settings  =  $setting->getCollection()->addFieldToFilter('user_id', 1)->getData();
+
+$productTableErrors = Mage::getModel('tradesy_importer/product')->getCollection()->setCurPage($currentPage)->setPageSize(10);
+//$errors = $productTableErrors->addFieldToFilter('tradesy_product_id ', array('eq' => 0))->addFieldToFilter('log', array('like'=>'%Error%'))->getData();
+$errors = $productTableErrors->addFieldToFilter('log', array('like'=>'%Error%'))->getData();
+$itemsPerPage = 10;
+//break total records into pages
+//$pages = ceil(count($errors)/$itemsPerPage);
+$pages = $productTableErrors->getLastPageNumber();
+
+
+$productTable = Mage::getModel('tradesy_importer/product');
+$productMappedCount = $productTable->getMappedProductsCount();
+
+
+//echo $block->helper->getProductCountByStore($websiteId);
+
+$productOnWebsiteCount = $block->helper->getProductsByWebsiteCount($websiteId);
+?>
+
+<?php  if ($this->helper->isUserConnected()) : ?>
+<div class="tradesy-content">
+    <hgroup>
+        <h1 class="title"><span>Tradesy</span> - Dashboard</h1>
+        <h2 class="short-description">The Marketplace for Luxury Fashion</h2>
+    </hgroup>
+    <!-- Progress bar holder -->
+    <div id="progress"></div>
+    <!-- Progress information -->
+    <div id="information"></div>
+    <div class="box">
+        <ul>
+            <li>Last Export: </li>
+            <!--<li>Chosen store: <?php echo $chosenStoreName; ?></li>
+            <li>Total Products on this Store:  <?php echo $productOnWebsiteCount; ?></li>-->
+            <li>Total Category Mapped: <?php echo $categoryMappedCount; ?></li>
+            <li>Total Products Send to Tradesy: <?php echo $sentProductCount; ?></li>
+            <li>Total Products Connected to Tradesy: <?php echo $productMappedCount; ?></li>
+            <li>Failed Imports into Tradesy: <?php echo abs($sentProductCount - $productMappedCount); ?></li>
+        </ul>
+    </div>
+
+    <div class="master-content">
+        <form id="saveProducts" class="saveProducts" method="post" action="<?php echo $adminAjaxUrl; ?>">
+            <div style="float:left; width:100%">
+                <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+                <input type="hidden" name="user_token" value="<?php echo $userToken; ?>"/>
+                <input type="hidden" name="type" value="saveProducts">
+
+
+                <?php if (!empty($exportResults)) : ?>
+
+                    <div class="box">
+                        <h3>Last export results</h3>
+
+
+                        <div style="margin-bottom:20px; border:1px solid #efefef; padding:10px; width:100%;" class="table_no_subdiv">
+                            <?php if (!empty($errors)) : ?>
+                            <div> <div>Product Name</div> <div> Failed Reason </div> <div> Improve Mapping </div> </div>
+                            <?php endif; ?>
+
+                            <?php $pageNumber = 0; ?>
+                            <?php foreach ($errors as $data): ?>
+                                <?php $prod = Mage::getModel('catalog/product')->load($data['product_id']); ?>
+                                <?php $tradesyCategoryId = Mage::getModel('tradesy_importer/product')->getTradesyCategory($data['product_id']); ?>
+                                <div>
+                                    <div> <a href="<?php echo  Mage::helper("adminhtml")->getUrl('/catalog_product/edit', array('id'=> $prod->getId())); ?>"><?php echo $prod->getName(); ?></a></div>
+                                    <div> <?php echo html_entity_decode($data['log']); ?></div>
+                                    <div> <a href="<?php echo Mage::helper("adminhtml")->getUrl('/tradesy/item', array('item_id'=> $prod->getId(), 'tradesy_category' => $tradesyCategoryId ) ); ?>">Fix Mapping</a> </div>
+                                </div>
+
+                            <?php $pageNumber++; endforeach;  ?>
+
+                        </div>
+                        <div>
+                            <nav class="tradesy-pager">
+                                <ul>
+                                    <?php for ($p = 1; $p <= $pages; $p++) : ?>
+                                        <?php
+                                        $display=0;
+                                        $numPages = $pages;
+
+                                        $dif=abs($currentPage-$p);
+                                        if ($p==1 || $p==$numPages) {
+                                            $display=1;
+                                        } else {
+
+                                            if ($dif <= 3) {
+                                                $display = 1;
+                                            } elseif (($dif <= 30 || $numPages < 10) && ($p % 10) == 0) {
+                                                $display = 1;
+                                            } elseif (($dif <= 300 || $numPages < 100) && ($p % 100) == 0) {
+                                                $display = 1;
+                                            } elseif (($dif <= 3000 || $numPages < 1000) && ($p % 1000) == 0) {
+                                                $display = 1;
+                                            } elseif (($dif <= 30000 || $numPages < 10000) && ($p % 10000) == 0) {
+                                                $display = 1;
+                                            } elseif (($dif <= 300000 || $numPages < 100000) && ($p % 100000) == 0) {
+                                                $display = 1;
+                                            } elseif (($dif <= 300000 || $numPages < 1000000) && ($p % 1000000) == 0) {
+                                                $display = 1;
+                                            } elseif ($p % 10000000 == 0) {
+                                                $display = 1;
+                                            }
+                                        }
+
+
+                                        ?>
+                                        <?php if ($display) : ?>
+                                        <li><a href="<?php echo Mage::helper("adminhtml")->getUrl('/tradesy/post', array('page'=> $p) ); ?>">
+                                                <?php echo $p; ?>
+                                            </a>
+                                        </li>
+                                            <?php endif; ?>
+                                    <?php endfor; ?>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                </div><br>
+            <div class="modal-loader">
+
+                <div class="spinner">
+                    <div class="double-bounce1"></div>
+                    <div class="double-bounce2"></div>
+                </div>
+            </div>
+            <!--<input style="float:left;" type="button" class="btn med black fleft" id="startExport"   onclick="return submitProducts(jQuery(this).parent('form'));" value="Start">
+            -->
+            <a style="float:left;" class="btn med black fleft" href="<?php echo  Mage::helper("adminhtml")->getUrl('/tradesy/export', array()); ?>">Start
+                </a>
+        </form>
+    </div>
+</div>
+
+
+    <style>
+        .tradesy-cat-list {
+            padding-top: 1em;
+        }
+
+        .modal-loader{
+            position: relative;
+            float:left;
+            background:#fff;
+        }
+
+    </style>
+    <script>
+        jQuery.noConflict();
+        jQuery(".spinner").hide();
+
+       /* setInterval(function() {
+
+            window.location.reload();
+
+        }, 5000);*/
+        jQuery("#startExport").click(function(){
+
+            jQuery(".spinner").slideDown();
+
+            var dataToSend = "form_key=" + encodeURIComponent("<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>");
+
+            jQuery.ajax({
+                type: "POST",
+                url: "<?php echo Mage::helper("adminhtml")->getUrl('/tradesy/export') . '?isAjax=true';; ?>",
+                data: dataToSend,
+                success: function(data, textStatus, request){
+                    // location.reload();
+                    jQuery(window).scrollTop();
+
+                   // jQuery(".spinner").hide();
+                },
+                error: function (request, textStatus, errorThrown) {
+
+                }
+            });
+
+
+        });
+
+        /*
+        function submitProducts(form){
+            //Proceed AJAX POST
+            //  ajaxPost(jQuery(form).attr('action'), form);
+            jQuery("#startExport").prop("disabled",true);
+            jQuery("#startExport").attr("value","Exporting...");
+            jQuery(".spinner").slideDown();
+
+            jQuery.ajax({
+                type: "POST",
+                url: "<?php echo $adminAjaxUrl; ?>",
+                data: form.serialize(),
+                success: function(data, textStatus, request){
+                   // location.reload();
+                    jQuery(".spinner").hide();
+                },
+                error: function (request, textStatus, errorThrown) {
+
+                }
+            });
+        }*/
+    </script>
+<?php else : ?>
+
+ <?php endif; ?>
+<script>
+
+
+    jQuery.noConflict();
+    jQuery(document).ready(function($){
+        function getProgress(){
+            var progressBar = $('#progress');
+            console.log($('#message').text());
+            var dataToSend = "form_key=" + encodeURIComponent("<?php echo Mage::getSingleton('core/session')->getFormKey(); ?>");
+
+            jQuery.ajax({
+                type: "POST",
+                url: "<?php echo Mage::helper("adminhtml")->getUrl('/tradesy/progress') . '?isAjax=true'; ?>",
+                data: dataToSend,
+                dataType: 'json',
+                success: function(data, textStatus, request){
+
+                    console.log(data.notice);
+
+                    if (data.progress > 0 && data.progress <= 100){
+
+                        var anim = '';
+                        if (data.progress == 100){
+                            anim = 'stop-animation';
+                        }
+
+                        progressBar.html('<div class="progress-fill  '+anim+' " style="background:#000;width:'+data.progress.trim()+'%; ">&nbsp;</div>');
+
+                        if (data.notice != ''){
+                            progressBar.append(data.notice);
+                        }
+                    }
+
+                    setTimeout(function(){getProgress();}, 5000);
+                },
+                error: function (request, textStatus, errorThrown) {
+
+                }
+            });
+        }
+
+        getProgress();
+    });
+
+</script>
