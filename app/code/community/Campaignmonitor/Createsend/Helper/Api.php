@@ -235,7 +235,7 @@ class Campaignmonitor_Createsend_Helper_Api extends Mage_Core_Helper_Abstract
                 "subscribers/{$listId}/import",
                 array(
                     'Subscribers'                            => $partialData,
-                    'Resubscribe'                            => true,
+                    'Resubscribe'                            => false,
                     'QueueSubscriptionBasedAutoResponders'   => false,
                     'RestartSubscriptionBasedAutoresponders' => true
                 ),
