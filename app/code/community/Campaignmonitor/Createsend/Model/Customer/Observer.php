@@ -349,7 +349,7 @@ class Campaignmonitor_Createsend_Model_Customer_Observer
                 } elseif ($magentoAtt == 'gender') {
 
                     $gender = "";
-                    if (array_key_exists($gender, $customerData)){
+                    if (array_key_exists($magentoAtt, $customerData)){
                         $gender = $customer->getAttribute($magentoAtt)->getSource()->getOptionText($customerData[$magentoAtt]);
                     }
 
