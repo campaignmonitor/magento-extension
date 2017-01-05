@@ -1,0 +1,11 @@
+{
+  "name": "campaign-moniter/campaign-moniter",
+    "type": "magento-plugin",
+    "license": "OSL",
+    "require": {
+      "magento-hackathon/magento-composer-installer": "*"
+    },
+    "extra": {
+      "magento-root-dir": "."
+    }
+}

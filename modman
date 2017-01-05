@@ -1,0 +1,4 @@
+app/code/community/Campaignmonitor/Createsend     app/code/community/Campaignmonitor/Createsend
+app/design/adminhtml/default/default/layout/*    app/design/adminhtml/default/default/layout/
+app/design/adminhtml/default/default/template/campaignmonitor    app/design/adminhtml/default/default/template/campaignmonitor
+app/etc/modules/*    app/etc/modules/
