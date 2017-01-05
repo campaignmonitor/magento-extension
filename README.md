@@ -12,3 +12,27 @@ Research shows that personalized, relevant email marketing campaigns have at lea
 * Celebrate an important date, such as a birthday
 
 Campaign Monitor makes it easy for you to get started by automatically creating segments for you based on what we’ve found to be the most actionable audiences in Magento. Use these segments to automate marketing campaigns.
+
+## Installation
+
+Add the following to your `composer.json`:
+
+```json
+"repositories": {
+...
+    {
+            "type": "vcs",
+            "url": "https://github.com/campaignmonitor/magento-extension.git"
+    }
+...
+},
+"require": {
+...
+    "campaignmonitor/campaignmonitor": "dev-master"
+    ...
+}
+```
+
+And then run:
+
+    $ composer update
