@@ -1,5 +1,5 @@
 {
-  "name": "campaign-moniter/campaign-moniter",
+  "name": "campaign-monitor/campaign-monitor",
     "type": "magento-plugin",
     "license": "OSL",
     "require": {
