@@ -1,0 +1,20 @@
+{
+    "name": "campaignmonitor/magento-extension",
+    "description":"Use your rich customer data in Magento to segment your customer base and send the personal, hyper-targeted email marketing campaigns that drive valuable ROI back to the business.",
+    "keywords": [
+        "magento",
+        "campaignmonitor",
+        "campaign",
+        "monitor",
+        "personalized",
+        "email"
+    ],
+    "license": "OSL-3.0",
+    "type": "magento-module",
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    },
+    "extra": {
+        "auto-append-gitignore": true
+    }
+}
