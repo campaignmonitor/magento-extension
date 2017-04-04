@@ -54,8 +54,9 @@ class Campaignmonitor_Createsend_Block_Linkedattributes extends Mage_Adminhtml_B
         if ($columnName == 'magento') {
             $rendered = '<select name="'.$inputName.'">';
             foreach ($this->magentoOptions as $att => $name) {
-                $rendered .= '<option value="'.$att.'">'.$name.'</option>';
+                $rendered .= '<option value="'.$att.'">'. htmlspecialchars($name) .'</option>';
             }
+
             $rendered .= '</select>';
         } else {
             return '<input type="text" name="' . $inputName . '" value="#{' . $columnName . '}" ' . ($column['size'] ? 'size="' . $column['size'] . '"' : '') . '/>';

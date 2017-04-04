@@ -98,7 +98,7 @@
                         <api_test_button translate="label comment">
                             <label>Test API</label>
                             <frontend_type>button</frontend_type>
-                            <frontend_model>createsend/testApi</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_testApi</frontend_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -108,7 +108,7 @@
                         <create_segment_button translate="label">
                             <label>Create Example Segments</label>
                             <frontend_type>button</frontend_type>
-                            <frontend_model>createsend/createExampleSegments</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_createExampleSegments</frontend_model>
                             <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -148,7 +148,7 @@
                         <subscriber_synchronisation_resolution_method translate="label comment">
                             <label>Subscription Synchronization Conflict Resolution Method</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>createsend/config_ConflictResolutionMethod</source_model>
+                            <source_model>campaignmonitor_createsend_model_config_ConflictResolutionMethod</source_model>
                             <sort_order>210</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -161,7 +161,7 @@
                         <subscriber_synchronisation_preferred_source translate="label comment">
                             <label>Preferred Source</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>createsend/config_SubscriptionSources</source_model>
+                            <source_model>campaignmonitor_createsend_model_config_SubscriptionSources</source_model>
                             <sort_order>220</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -184,7 +184,7 @@
                         <create_segment_button translate="label comment">
                             <label>Create Example Segments</label>
                             <frontend_type>button</frontend_type>
-                            <frontend_model>createsend/createExampleSegments</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_createExampleSegments</frontend_model>
                             <sort_order>700</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -214,7 +214,7 @@
                     <fields>
                         <m_to_cm_attributes translate="label comment">
                             <label>Custom Field Mapping</label>
-                            <frontend_model>createsend/linkedattributes</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_linkedattributes</frontend_model>
                             <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                             <sort_order>100</sort_order>
                             <show_in_default>1</show_in_default>
@@ -243,7 +243,7 @@
                         </max_wishlist_items>
                         <wishlist_product_attributes translate="label">
                             <label>Custom Field Mapping</label>
-                            <frontend_model>createsend/wishlistattributes</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_wishlistattributes</frontend_model>
                             <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                             <sort_order>200</sort_order>
                             <show_in_default>1</show_in_default>
