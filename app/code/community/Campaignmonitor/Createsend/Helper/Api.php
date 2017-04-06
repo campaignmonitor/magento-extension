@@ -178,7 +178,7 @@ class Campaignmonitor_Createsend_Helper_Api extends Mage_Core_Helper_Abstract
             $email = $subscriber->getSubscriberEmail();
 
             $subscriberData['Name'] = "";
-            $subscriberData['CustomFields'] = array();
+            $subscriberData['CustomFields'] = Campaignmonitor_Createsend_Model_Customer_Observer::generateCustomFields($subscriber);
             $subscriberData['EmailAddress'] = $email;
 
             $websiteId = Mage::app()->getStore($subscriber->getStoreId())->getWebsiteId();
@@ -215,6 +215,7 @@ class Campaignmonitor_Createsend_Helper_Api extends Mage_Core_Helper_Abstract
         /** @var Campaignmonitor_Createsend_Helper_Data $helper */
         $helper = Mage::helper('createsend');
 
+        Mage::log( 'performing full sync', null, 'fullsync.log', true );
         $listId = $helper->getListId($storeId);
         $scope = 'stores';
         $scopeId = $storeId;

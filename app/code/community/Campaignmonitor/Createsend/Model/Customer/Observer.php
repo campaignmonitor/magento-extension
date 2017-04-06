@@ -313,10 +313,10 @@ class Campaignmonitor_Createsend_Model_Customer_Observer
         if (!empty($linkedAttributes)) {
             if ($customer->getId()) {
                 $customerData = $customer->getData();
-                Mage::log("Customer exists " . print_r($customerData, true));
+
             } else {
                 $customerData = array();
-                Mage::log("Customer doesn't exist ");
+
             }
             foreach ($linkedAttributes as $la) {
                 $magentoAtt = $la['magento'];
@@ -509,6 +509,8 @@ class Campaignmonitor_Createsend_Model_Customer_Observer
                         );
                     }
                 }
+
+                Mage::log(print_r($customFields, true), null, 'customer.fields.log', true);
 
                 // Clear out other items, if any
                 for ($i = $count + 1; $i <= $maxWishlistItems; $i++) {
