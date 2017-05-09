@@ -79,7 +79,7 @@ class Campaignmonitor_Createsend_Model_List_Cron extends Campaignmonitor_Creates
 
                 if (!$mageNewsletter->isSubscribed() || $mageNewsletter->getId() === null) {
                     $mageTimestamp = null;
-                    if ($mageNewsletter->getId() !== null) {
+                    if ($mageNewsletter->getId() !== null && !empty($mageNewsletter->getChangeStatusAt())) {
                         $mageTime = Mage::getModel('core/date')->timestamp($mageNewsletter->getChangeStatusAt());
                         $mageTimestamp = date('Y-m-d H:i:s', $mageTime);
                     }
@@ -158,9 +158,12 @@ class Campaignmonitor_Createsend_Model_List_Cron extends Campaignmonitor_Creates
                 }
 
                 if ($subscriptionState !== $api::SUBSCRIBER_STATUS_ACTIVE) {
-                    // Convert to local time
-                    $mageTime = Mage::getModel('core/date')->timestamp($subscriber->getChangeStatusAt());
-                    $mageTimeStamp = date('Y-m-d H:i:s', $mageTime);
+                    $mageTimeStamp = null;
+                    if (!empty($subscriber->getChangeStatusAt())) {
+                        // Convert to local time
+                        $mageTime = Mage::getModel('core/date')->timestamp($subscriber->getChangeStatusAt());
+                        $mageTimeStamp = date('Y-m-d H:i:s', $mageTime);
+                    }
 
                     // CM in local time
                     $cmTimestamp = null;
