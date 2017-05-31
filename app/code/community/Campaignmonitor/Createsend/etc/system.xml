@@ -223,7 +223,7 @@
                         <log_content translate="label comment">
                             <label>Log Content</label>
                             <frontend_type>textarea</frontend_type>
-                            <backend_model>createsend/log_reader</backend_model>
+                            <backend_model>Campaignmonitor_Createsend_Block_Log_Reader</backend_model>
                             <frontend_model>createsend/log_view</frontend_model>
                             <sort_order>200</sort_order>
                             <show_in_default>1</show_in_default>
