@@ -150,7 +150,9 @@ class Campaignmonitor_Createsend_Model_List_Cron extends Campaignmonitor_Creates
                 $scopeId
             );
 
-            if ($result['success'] || $result['data']['Code'] == $api::CODE_SUBSCRIBER_NOT_IN_LIST) {
+
+
+            if ($result['success'] || (isset($result['data']['Code'] ) && $result['data']['Code'] == $api::CODE_SUBSCRIBER_NOT_IN_LIST)) {
                 if (isset($result['data']['State'])) {
                     $subscriptionState = $result['data']['State'];
                 } else {

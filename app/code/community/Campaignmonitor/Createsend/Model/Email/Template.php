@@ -122,7 +122,7 @@ class Campaignmonitor_Createsend_Model_Email_Template extends Mage_Core_Model_Em
             $this->_mail = null;
         } catch (Exception $e) {
 
-            Mage::log( sprintf(self::ERR_CANNOT_SEND_EMAIL, $e->getMessage()), null, 'campaignmonitor_createsend_email.log', true );
+           
             return parent::send($email, $name, $variables);
         }
 
@@ -200,9 +200,6 @@ class Campaignmonitor_Createsend_Model_Email_Template extends Mage_Core_Model_Em
             $scopeId
         );
 
-        Mage::log( print_r($emailData,true), null, 'email.log', true );
-        Mage::log( print_r($result,true), null, 'email.log', true );
-        Mage::log( print_r($this->getData(),true), null, 'email2.log', true );
         if (!$result['success']) {
             $notice = 'Couldn\'t send email through campaign monitor but your email was sent through magento though';
 
@@ -211,7 +208,7 @@ class Campaignmonitor_Createsend_Model_Email_Template extends Mage_Core_Model_Em
                 $notice .= $result['data']['Message'];
             }
             Mage::getSingleton('core/session')->addNotice($notice);
-            throw new Exception($result['data']['Message']);
+//            throw new Exception($result['data']['Message']);
 
         }
     }
