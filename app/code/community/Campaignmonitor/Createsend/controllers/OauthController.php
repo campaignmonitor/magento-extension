@@ -145,4 +145,12 @@ class Campaignmonitor_Createsend_OauthController extends Mage_Adminhtml_Controll
 
         return $this->_redirect(self::ADMINHTML_SYSTEM_CONFIG_EDIT, $configSection);
     }
+
+	/**
+	 * @return mixed
+	 */
+	protected function _isAllowed() {
+
+		return Mage::getSingleton('admin/session')->isAllowed('admin');
+	}
 }

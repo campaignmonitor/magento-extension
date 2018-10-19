@@ -49,13 +49,14 @@ class Campaignmonitor_Createsend_Model_Config_Backend_Source_Files extends Mage_
 
     }
 
-    /**
-     * Get options in "key-value" format
-     *
-     * @return array
-     */
-    public function toArray()
+	/**
+	 * @param array $arrAttributes
+	 *
+	 * @return array
+	 */
+    public function toArray(array $arrAttributes = array())
     {
+
         $directory = Mage::getBaseDir();
         $directory .= DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'log';
 

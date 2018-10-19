@@ -90,7 +90,7 @@ class Campaignmonitor_Createsend_Model_Api_Observer
             );
             $reply = $api->call(
                 Zend_Http_Client::POST,
-                "lists/${clientId}",
+                "lists/{$clientId}",
                 $params,
                 array(),
                 $scope,
@@ -338,7 +338,7 @@ class Campaignmonitor_Createsend_Model_Api_Observer
             // We don't know what the API is going to return to the user. For safety we indicate to the user it was
             // an API error, but log the API error as a warning.
             Mage::getSingleton('core/session')->addError(
-                sprintf(self::MSG_CANNOT_CREATE_SUBSCRIBER, $email)
+                sprintf(self::MSG_CANNOT_CREATE_SUBSCRIBER, $email, '')
             );
 
             // Log more detailed information for debugging

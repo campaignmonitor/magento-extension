@@ -62,7 +62,7 @@ class Campaignmonitor_Createsend_Adminhtml_Createsend_EmailController extends Ma
 
         $reply = $api->call(
             Zend_Http_Client::GET,
-            "transactional/messages/${messageId}",
+            "transactional/messages/{$messageId}",
             array(),
             array('statistics' => 'true'),
             $scope,
@@ -78,13 +78,11 @@ class Campaignmonitor_Createsend_Adminhtml_Createsend_EmailController extends Ma
 
         if ($display === 'body') {
             if (isset($reply['data']['Message']['Body']['Html'])) {
-                print $reply['data']['Message']['Body']['Html'];
-            } else {
-                print '';
+                // review check that this displays
+	            $this->getResponse()->setBody($reply['data']['Message']['Body']['Html']);
             }
         } else {
             Mage::register('createsend_email', $reply['data']);
-
             $this->loadLayout();
 
             $request = Mage::app()->getRequest();
@@ -99,7 +97,15 @@ class Campaignmonitor_Createsend_Adminhtml_Createsend_EmailController extends Ma
         }
     }
 
-    public function resendAction()
+	/**
+	 * @return mixed
+	 */
+	protected function _isAllowed() {
+
+		return Mage::getSingleton('admin/session')->isAllowed('admin');
+	}
+
+	public function resendAction()
     {
         $emailId = $this->getRequest()->getParam('email_id');
 

@@ -109,7 +109,10 @@ class Campaignmonitor_Createsend_Model_List_Cron extends Campaignmonitor_Creates
     {
         $stores = Mage::app()->getStores(true);
         foreach ($stores as $storeId => $store) {
-            $this->_synchroniseFromMagento($storeId);
+            // there is no need to sync admin store
+            if ($storeId !== 0) {
+                $this->_synchroniseFromMagento($storeId);
+            }
         }
     }
 
@@ -130,50 +133,77 @@ class Campaignmonitor_Createsend_Model_List_Cron extends Campaignmonitor_Creates
         /* @var Mage_Newsletter_Model_Subscriber $subscribers */
         $mageNewsletter = Mage::getModel('newsletter/subscriber');
 
-        $collection = $mageNewsletter->getCollection()
-            ->addFieldToFilter('store_id', $storeId)
-            ->addFieldToFilter('subscriber_status', Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+        $pagedSize = 100;
+        $collection = $mageNewsletter->getCollection('subscriber_id')
+            ->addFieldToFilter( 'store_id', $storeId )
+            ->addFieldToFilter( 'subscriber_status', Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED );
+        $collection->setPageSize($pagedSize);
+        $collection->setCurPage(1);
+        $lastPage = $collection->getLastPageNumber();
 
-        foreach ($collection as $subscriber) {
-            $email = $subscriber->getEmail();
+        if (!empty($collection) && $collection->count() > 0) {
 
-            /** @var Campaignmonitor_Createsend_Model_Api $api */
-            $api = Mage::getSingleton('createsend/api');
+            for ($i = 1; $i <= $lastPage; $i++) {
 
-            // Check CM subscriber status
-            $result = $api->call(
-                Zend_Http_Client::GET,
-                "subscribers/{$listId}",
-                array(),
-                array('email' => $email),
-                $scope,
-                $scopeId
-            );
+                $collection = $mageNewsletter->getCollection()
+                    ->addFieldToFilter( 'store_id', $storeId )
+                    ->addFieldToFilter( 'subscriber_status', Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED );
+                $collection->setPageSize($pagedSize);
+                $collection->setCurPage($i);
 
+                foreach ($collection as $subscriber) {
+                    $email = $subscriber->getEmail();
 
+                    /** @var Campaignmonitor_Createsend_Model_Api $api */
+                    $api = Mage::getSingleton('createsend/api');
 
-            if ($result['success'] || (isset($result['data']['Code'] ) && $result['data']['Code'] == $api::CODE_SUBSCRIBER_NOT_IN_LIST)) {
-                if (isset($result['data']['State'])) {
-                    $subscriptionState = $result['data']['State'];
-                } else {
-                    $subscriptionState = $api::SUBSCRIBER_STATUS_DELETED;
-                }
-
-                if ($subscriptionState !== $api::SUBSCRIBER_STATUS_ACTIVE) {
-                    // Convert to local time
-                    $mageTime = Mage::getModel('core/date')->timestamp($subscriber->getChangeStatusAt());
-                    $mageTimeStamp = date('Y-m-d H:i:s', $mageTime);
-
-                    // CM in local time
-                    $cmTimestamp = null;
-                    if (isset($result['data']['Date'])) {
-                        $cmTimestamp = $result['data']['Date'];
-                    }
-
-                    $this->_applyResolutionMethod(
-                        Campaignmonitor_Createsend_Model_Config_SubscriptionSources::SOURCE_MAGENTO,
-                        $email, $mageTimeStamp, $cmTimestamp, $scope, $scopeId
+                    // Check CM subscriber status
+                    $result = $api->call(
+                        Zend_Http_Client::GET,
+                        "subscribers/{$listId}",
+                        array(),
+                        array('email' => $email),
+                        $scope,
+                        $scopeId
                     );
+
+
+
+                    if ($result['success'] || (isset($result['data']['Code'] ) && $result['data']['Code'] == $api::CODE_SUBSCRIBER_NOT_IN_LIST)) {
+                        if (isset($result['data']['State'])) {
+                            $subscriptionState = $result['data']['State'];
+                        } else {
+                            $subscriptionState = $api::SUBSCRIBER_STATUS_DELETED;
+                        }
+
+	                    if ( $subscriptionState === Campaignmonitor_Createsend_Model_Api::SUBSCRIBER_STATUS_UNCONFIRMED ) {
+		                    $scopeModel = Mage::getModel('createsend/config_scope');
+		                    $storeId = $scopeModel->getStoreIdFromScope($scope, $scopeId);
+
+		                    $resolutionMethod = $helper->getSubscriberSynchronisationResolutionMethod($storeId);
+
+		                    if ( $resolutionMethod === Campaignmonitor_Createsend_Model_Config_ConflictResolutionMethod::RESOLUTION_METHOD_TIMESTAMP ) {
+			                    continue;
+		                    }
+	                    }
+
+                        if ($subscriptionState !== $api::SUBSCRIBER_STATUS_ACTIVE) {
+                            // Convert to local time
+                            $mageTime = Mage::getModel('core/date')->timestamp($subscriber->getChangeStatusAt());
+                            $mageTimeStamp = date('Y-m-d H:i:s', $mageTime);
+
+                            // CM in local time
+                            $cmTimestamp = null;
+                            if (isset($result['data']['Date'])) {
+                                $cmTimestamp = $result['data']['Date'];
+                            }
+
+                            $this->_applyResolutionMethod(
+                                Campaignmonitor_Createsend_Model_Config_SubscriptionSources::SOURCE_MAGENTO,
+                                $email, $mageTimeStamp, $cmTimestamp, $scope, $scopeId
+                            );
+                        }
+                    }
                 }
             }
         }

@@ -47,12 +47,15 @@ class Campaignmonitor_Createsend_Helper_Data extends Mage_Core_Helper_Data
     /**
      * Logs all extension specific notices to a separate file
      *
-     * @param string $message The message to log
+     * @param string | array $message The message to log
      * @param int $level The log level (defined in the Zend_Log class)
      */
     public function log($message, $level = Zend_Log::DEBUG)
     {
         if ($this->canLog()) {
+	        if ( is_array( $message ) ) {
+		        $message = print_r( $message, true );
+	        }
             Mage::log($message, $level, self::LOGFILE);
         }
     }

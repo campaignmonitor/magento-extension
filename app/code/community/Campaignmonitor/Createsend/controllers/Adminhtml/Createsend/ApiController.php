@@ -118,6 +118,7 @@ class Campaignmonitor_Createsend_Adminhtml_Createsend_ApiController extends Mage
         $this->getResponse()->setBody($jsonData);
     }
 
+
     /**
      * Returns the Campaign Monitor subscription lists for the client.
      * Prints out the lists in JSON format.
@@ -143,4 +144,48 @@ class Campaignmonitor_Createsend_Adminhtml_Createsend_ApiController extends Mage
         $this->getResponse()->setHeader('Content-type', 'application/json');
         $this->getResponse()->setBody($jsonData);
     }
+
+	/**
+	 * Gets the log content
+	 */
+	public function getFileContentAction()
+	{
+		$scope = $this->getRequest()->getQuery('scope');
+		$scopeId = $this->getRequest()->getQuery('scopeId');
+		$filename = $this->getRequest()->getQuery('filename');
+
+		$directory = Mage::getBaseDir();
+		$directory .= DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'log';
+
+		$filename = $directory . DIRECTORY_SEPARATOR . $filename;
+		$content = '';
+		$status = 'success';
+
+		if (file_exists( $filename )) {
+			try {
+				$content = file_get_contents( $filename, NULL, NULL, 0, 5000000);
+			} catch ( Exception $exception ) {
+				$status = 'error';
+				$content = $exception->getMessage();
+			}
+		}
+
+		$jsonData = json_encode(
+			array (
+				'status'    =>  $status,
+				'content'     => $content
+			)
+		);
+
+		$this->getResponse()->setHeader('Content-type', 'application/json');
+		$this->getResponse()->setBody($jsonData);
+	}
+
+	/**
+	 * @return mixed
+	 */
+	protected function _isAllowed() {
+
+		return Mage::getSingleton('admin/session')->isAllowed('admin');
+	}
 }

@@ -33,6 +33,7 @@ abstract class Campaignmonitor_Createsend_Model_Cron
         $useMagentoCron = $helper->isMagentoCronEnabled(Mage_Core_Model_App::ADMIN_STORE_ID);
 
         if ($useMagentoCron) {
+
             $this->runJob();
         }
     }
@@ -42,7 +43,7 @@ abstract class Campaignmonitor_Createsend_Model_Cron
      *
      * @return mixed
      */
-    abstract function runJob();
+    public abstract function runJob();
 
     /**
      * Executes function(s) in $functions array for all scopes where $configPath configuration value is defined

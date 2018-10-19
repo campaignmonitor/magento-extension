@@ -95,7 +95,7 @@ class Campaignmonitor_Createsend_Helper_Api extends Mage_Core_Helper_Abstract
 
         $reply = $api->call(
             Zend_Http_Client::GET,
-            "clients/${clientId}/lists",
+            "clients/{$clientId}/lists",
             array(),
             array(),
             $scope,
@@ -210,12 +210,11 @@ class Campaignmonitor_Createsend_Helper_Api extends Mage_Core_Helper_Abstract
      * @param $storeId
      * @return array|bool|null
      */
-    function performFullSync($storeId)
+    public function performFullSync($storeId)
     {
         /** @var Campaignmonitor_Createsend_Helper_Data $helper */
         $helper = Mage::helper('createsend');
 
-        Mage::log( 'performing full sync', null, 'fullsync.log', true );
         $listId = $helper->getListId($storeId);
         $scope = 'stores';
         $scopeId = $storeId;

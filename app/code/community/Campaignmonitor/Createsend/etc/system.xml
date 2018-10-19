@@ -29,7 +29,7 @@
             <label>General</label>
             <tab>campaignmonitor</tab>
             <frontend_type>text</frontend_type>
-            <sort_order>10</sort_order>
+            <sort_order>100</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
@@ -99,7 +99,7 @@
                         <api_test_button translate="label comment">
                             <label>Test API</label>
                             <frontend_type>button</frontend_type>
-                            <frontend_model>createsend/testApi</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_testApi</frontend_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -109,7 +109,7 @@
                         <create_segment_button translate="label">
                             <label>Create Example Segments</label>
                             <frontend_type>button</frontend_type>
-                            <frontend_model>createsend/createExampleSegments</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_createExampleSegments</frontend_model>
                             <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -149,7 +149,7 @@
                         <subscriber_synchronisation_resolution_method translate="label comment">
                             <label>Subscription Synchronization Conflict Resolution Method</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>createsend/config_ConflictResolutionMethod</source_model>
+                            <source_model>campaignmonitor_createsend_model_config_ConflictResolutionMethod</source_model>
                             <sort_order>210</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -162,7 +162,7 @@
                         <subscriber_synchronisation_preferred_source translate="label comment">
                             <label>Preferred Source</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>createsend/config_SubscriptionSources</source_model>
+                            <source_model>campaignmonitor_createsend_model_config_SubscriptionSources</source_model>
                             <sort_order>220</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -185,7 +185,7 @@
                         <create_segment_button translate="label comment">
                             <label>Create Example Segments</label>
                             <frontend_type>button</frontend_type>
-                            <frontend_model>createsend/createExampleSegments</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_createExampleSegments</frontend_model>
                             <sort_order>700</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -223,8 +223,8 @@
                         <log_content translate="label comment">
                             <label>Log Content</label>
                             <frontend_type>textarea</frontend_type>
-                            <backend_model>Campaignmonitor_Createsend_Block_Log_Reader</backend_model>
-                            <frontend_model>createsend/log_view</frontend_model>
+                            <backend_model>campaignmonitor_createsend_block_log_reader</backend_model>
+                            <frontend_model>campaignmonitor_createsend_block_log_view</frontend_model>
                             <sort_order>200</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -239,7 +239,7 @@
             <label>Customers</label>
             <tab>campaignmonitor</tab>
             <frontend_type>text</frontend_type>
-            <sort_order>20</sort_order>
+            <sort_order>200</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
@@ -254,7 +254,7 @@
                     <fields>
                         <m_to_cm_attributes translate="label comment">
                             <label>Custom Field Mapping</label>
-                            <frontend_model>createsend/linkedattributes</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_linkedattributes</frontend_model>
                             <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                             <sort_order>100</sort_order>
                             <show_in_default>1</show_in_default>
@@ -283,7 +283,7 @@
                         </max_wishlist_items>
                         <wishlist_product_attributes translate="label">
                             <label>Custom Field Mapping</label>
-                            <frontend_model>createsend/wishlistattributes</frontend_model>
+                            <frontend_model>campaignmonitor_createsend_block_wishlistattributes</frontend_model>
                             <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
                             <sort_order>200</sort_order>
                             <show_in_default>1</show_in_default>
@@ -298,7 +298,7 @@
             <label>Transactional</label>
             <tab>campaignmonitor</tab>
             <frontend_type>text</frontend_type>
-            <sort_order>30</sort_order>
+            <sort_order>300</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
