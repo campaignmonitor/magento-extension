@@ -23,7 +23,6 @@ class Campaignmonitor_Createsend_Adminhtml_Createsend_SegmentController extends 
      *
      * @link https://www.campaignmonitor.com/api/segments/
      *
-     * @return Mage_Core_Controller_Varien_Action
      */
     public function createExamplesAction()
     {
@@ -35,10 +34,20 @@ class Campaignmonitor_Createsend_Adminhtml_Createsend_SegmentController extends 
 
         $responses = $api->createExampleSegments($scope, $scopeId);
 
-        print json_encode(
-            array(
-                'messages'   => $responses
-            )
-        );
+	    $this->getResponse()
+             ->setHeader('Content-Type', 'application/json')
+	         ->setBody(json_encode(
+		         array(
+			         'messages'   => $responses
+		         )
+	         ));
     }
+
+	/**
+	 * @return mixed
+	 */
+	protected function _isAllowed() {
+
+		return Mage::getSingleton('admin/session')->isAllowed('admin');
+	}
 }

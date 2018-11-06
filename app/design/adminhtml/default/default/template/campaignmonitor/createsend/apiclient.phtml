@@ -29,7 +29,17 @@
             'scopeId'   => $scopeId,
         )
     )
-);
+    );
+
+    $getFileContentUrl = $this->getUrl(
+    'adminhtml/createsend_api/getFileContent',
+    array(
+        '_query'    => array(
+            'scope'     => $scope,
+            'scopeId'   => $scopeId,
+        )
+    )
+    );
 
 ?>
 <script type="text/javascript">
@@ -42,24 +52,55 @@
             {
                 clearApiError();
                 setClients($('createsend_general_api_api_client_id'), []);
+                var apiKeyToSave = $('createsend_general_api_api_key').value;
 
-                new Ajax.Request(
-                    '<?php echo $getClientsUrl ?>',
+                if (apiKeyToSave) {
+                    new Ajax.Request(
+                        '<?php echo $getClientsUrl ?>',
+                        {
+                            method: 'get',
+                            parameters: {
+                                scope: '<?php echo $scope; ?>',
+                                scopeId: '<?php echo $scopeId; ?>',
+                                apiKey: apiKeyToSave
+                            },
+                            onSuccess: function(response)
+                            {
+                                if (response.responseText) {
+                                    var reply = eval ("(" + response.responseText + ")");
+                                    if (reply.error) {
+                                        alert(reply.message);
+                                    } else {
+
+                                        setClients($('createsend_general_api_api_client_id'), reply.items);
+                                    }
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        );
+
+        $('createsend_general_debug_available_logs').observe(
+            'change',
+            function() {
+                var contentUrl = '<?php echo $getFileContentUrl; ?>';
+                new Ajax.Request(contentUrl,
                     {
                         method: 'get',
                         parameters: {
                             scope: '<?php echo $scope; ?>',
                             scopeId: '<?php echo $scopeId; ?>',
-                            apiKey: $('createsend_general_api_api_key').value
+                            filename: this.value
                         },
-                        onSuccess: function(response)
-                        {
+                        onSuccess: function (response) {
                             if (response.responseText) {
-                                var reply = eval ("(" + response.responseText + ")");
+                                var reply = eval("(" + response.responseText + ")");
                                 if (reply.error) {
-                                    alert(reply.message);
+                                    alert(reply.content);
                                 } else {
-                                    setClients($('createsend_general_api_api_client_id'), reply.items);
+                                    $('createsend_general_debug_log_content').value = reply.content;
                                 }
                             }
                         }
@@ -67,6 +108,8 @@
                 );
             }
         );
+
+
 
         $('createsend_general_api_api_client_id').observe(
             'change',
@@ -94,6 +137,10 @@
                                     alert(reply.message);
                                 } else {
                                     setLists($('createsend_general_api_list_id'), reply.items);
+                                    if (reply.items.length == 2) {
+                                        $('row_createsend_general_api_new_list_name').show();
+                                        document.getElementById('createsend_general_api_new_list_name').disabled = false;
+                                    }
                                 }
                             }
                         }
@@ -106,7 +153,6 @@
     function setClients(field, data)
     {
         var savedClientId = '<?php echo $savedClientId; ?>';
-
         field.options.length = 0;
 
         data.each(
@@ -154,6 +200,17 @@
 
         field.options.length = 0;
 
+        var emptyList = {};
+        emptyList.label = '';
+        emptyList.value = '';
+        data.push(emptyList);
+        if (data.length === 1) {
+            var emptyList = {};
+            emptyList.label = 'No List found';
+            emptyList.value = '';
+            data.push(emptyList);
+        }
+
         if (groupCmLists === undefined && data.length > 1) {
             // Reset new list group because we want it after the CM lists
             if (groupNewList !== undefined) {
@@ -164,23 +221,30 @@
             groupCmLists = new Element('optgroup');
             groupCmLists.label = "Lists in Campaign Monitor";
             $('createsend_general_api_list_id').insert(groupCmLists);
+
+
         }
 
         if (groupNewList === undefined && data.length > 1) {
             groupNewList = new Element('optgroup');
             groupNewList.label = "New list";
+
+
             $('createsend_general_api_list_id').insert(groupNewList);
         }
+
 
         var listCount = 0;
         var newCount = 0;
         data.each(
             function(c) {
                 var selected = false;
-                if (c.value == savedListId) {
+                if (c.value == savedListId ) {
                     selected = true;
                 }
                 var option = new Option(c.label, c.value, selected, selected);
+
+
                 if (c.value == 'NEW_LIST') {
                     groupNewList.insert(option);
                     newCount++;
@@ -195,16 +259,22 @@
                 }
             }
         );
+
+        field.options.each(function(e) {
+           console.log(e);
+        });
+
+        var emptyOption = new Option('', '');
+        groupCmLists.insert(emptyOption);
+
         if (groupCmLists !== undefined && listCount == 0) {
             groupCmLists.remove();
             groupCmLists = undefined;
         }
-
         if (groupNewList !== undefined && newCount == 0) {
             groupNewList.remove();
             groupNewList = undefined;
         }
-
         if (data.length == 3) {
             // Only one list (+ selection prompt + create new list), auto-select the single list
             field.selectedIndex = 1;
@@ -214,7 +284,6 @@
             // API Error
             displayApiError(data[0].message);
         }
-
         hideNewList();
     }
 

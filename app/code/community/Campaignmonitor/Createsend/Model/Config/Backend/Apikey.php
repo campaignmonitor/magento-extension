@@ -15,38 +15,42 @@
  * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
-class Campaignmonitor_Createsend_Model_Config_Backend_Apikey extends Mage_Core_Model_Config_Data
-{
-    const ERR_INVALID_API_KEY       = 'Invalid API Key: %s';
-    const MSG_VALID_API_KEY         = 'Valid API Key.';
-    /**
-     *
-     * @return Mage_Core_Model_Abstract
-     */
-    protected function _afterSave()
-    {
-        $request = Mage::app()->getRequest();
-        $website = $request->getUserParam('website');
-        $store   = $request->getUserParam('store');
-        list($scope, $scopeId) = Mage::getSingleton('createsend/config_scope')->_getScope($website, $store);
+class Campaignmonitor_Createsend_Model_Config_Backend_Apikey extends Mage_Core_Model_Config_Data {
+	const ERR_INVALID_API_KEY = 'Invalid API Key: %s';
+	const MSG_VALID_API_KEY = 'Valid API Key.';
 
-        /** @var Campaignmonitor_Createsend_Helper_Api $apiHelper */
-        $apiHelper = Mage::helper('createsend/api');
+	/**
+	 *
+	 * @return Mage_Core_Model_Abstract
+	 */
+	protected function _afterSave() {
+		$request = Mage::app()->getRequest();
+		$website = $request->getUserParam( 'website' );
+		$store   = $request->getUserParam( 'store' );
+		list( $scope, $scopeId ) = Mage::getSingleton( 'createsend/config_scope' )->_getScope( $website, $store );
 
-        // Test API Key by getting the list of clients
-        $reply = $apiHelper->testApiKey($scope, $scopeId);
+		/** @var Campaignmonitor_Createsend_Helper_Data $helper */
+		$helper = Mage::helper( 'createsend' );
 
-        if ($reply['success'] === false) {
-            Mage::getSingleton('adminhtml/session')->addError(
-                sprintf(self::ERR_INVALID_API_KEY, $reply['data']['Message'])
-            );
-        } else {
-            // Display success message only when value is changed
-            if ($this->isValueChanged()) {
-                Mage::getSingleton('adminhtml/session')->addSuccess(sprintf(self::MSG_VALID_API_KEY));
-            }
-        }
+		if ( $helper->getApiKey( $scope, $scopeId ) !== '' ) {
+			/** @var Campaignmonitor_Createsend_Helper_Api $apiHelper */
+			$apiHelper = Mage::helper( 'createsend/api' );
 
-        return parent::_afterSave();
-    }
+			// Test API Key by getting the list of clients
+			$reply = $apiHelper->testApiKey( $scope, $scopeId );
+
+			if ( $reply['success'] === false ) {
+				Mage::getSingleton( 'adminhtml/session' )->addError(
+					sprintf( self::ERR_INVALID_API_KEY, $reply['data']['Message'] )
+				);
+			} else {
+				// Display success message only when value is changed
+				if ( $this->isValueChanged() ) {
+					Mage::getSingleton( 'adminhtml/session' )->addSuccess( sprintf( self::MSG_VALID_API_KEY ) );
+				}
+			}
+		}
+
+		return parent::_afterSave();
+	}
 }

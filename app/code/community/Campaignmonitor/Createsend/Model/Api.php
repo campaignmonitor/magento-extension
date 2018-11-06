@@ -59,10 +59,12 @@ class Campaignmonitor_Createsend_Model_Api
 
     const SUBSCRIBER_STATUS_ACTIVE      = 'Active';
     const SUBSCRIBER_STATUS_DELETED     = 'Deleted';
+    const SUBSCRIBER_STATUS_UNCONFIRMED = 'Unconfirmed';
     
     const WEBHOOK_STATUS_ACTIVE         = 'Active';
     const WEBHOOK_STATUS_UNSUBSCRIBED   = 'Unsubscribed';
     const WEBHOOK_STATUS_DELETED        = 'Deleted';
+
 
     const WEBHOOK_PAYLOAD_FORMAT_JSON   = 'Json';
 
@@ -166,12 +168,25 @@ class Campaignmonitor_Createsend_Model_Api
         $version = Mage::getVersion();
         $edition = 'ce';
 
+        if (version_compare($version, '1.7.0.0', '>=')) {
+            // version 1.7 has a special method for finding the edition
+            $edition = Mage::getEdition();
+
+            return sprintf('%s %s', $edition, $version);
+        }
+
         // If the version is above 1.6.0.0 it might be professional or enterprise.
         if (version_compare($version, '1.6.0.0', '>=')) {
 
             try {
                 // Calculate whether the install has gift cards. if it doesn't, it's community.
-                $hasGiftcards = Mage::getModel('enterprise_giftcard/giftcard');
+                $hasGiftcards = false;
+                try {
+                    $hasGiftcards = Mage::getModel('enterprise_giftcard/giftcard');
+                } catch (Exception $exception) {
+                    return sprintf('%s %s', $edition, $version);
+                }
+
                 if ($hasGiftcards) {
                     // Check whether the installation has the enterprise search observer. Only enterprise has this.
                     $hasSolr = Mage::getModel('enterprise_search/observer');
@@ -187,9 +202,7 @@ class Campaignmonitor_Createsend_Model_Api
             } catch(Exception $e){
                 Mage::logException($e);
             }
-
         }
-
         return sprintf('%s %s', $edition, $version);
     }
 
@@ -653,6 +666,7 @@ class Campaignmonitor_Createsend_Model_Api
         $scopeModel = Mage::getModel('createsend/config_scope');
         $storeId = $scopeModel->getStoreIdFromScope($scope, $scopeId);
 
+
         return $this->call(
             Zend_Http_Client::POST,
             "subscribers/{$helper->getListId($storeId)}/unsubscribe",
@@ -742,6 +756,8 @@ class Campaignmonitor_Createsend_Model_Api
         $errors = array();
 
         foreach ($linkedAttributes as $la) {
+
+            $la['magento'] = htmlspecialchars( $la['magento'] );
             $magentoAtt = $la['magento'];
             $cmAtt = $attrSource->getCustomFieldName($la['magento'], true);
             $dataType = $attrSource->getFieldType($magentoAtt);

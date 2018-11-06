@@ -63,6 +63,7 @@ class Campaignmonitor_Createsend_WebhooksController extends Mage_Core_Controller
 
         try {
             $hookData = Zend_Json::decode($this->getRequest()->getRawBody());
+
         } catch (Zend_Json_Exception $e) {
             $helper->log('Error decoding webhook body: ' . $e->getMessage());
             $this->getResponse()->setHttpResponseCode(self::HTTP_BAD_REQUEST);
