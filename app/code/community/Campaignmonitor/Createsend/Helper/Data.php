@@ -96,7 +96,7 @@ class Campaignmonitor_Createsend_Helper_Data extends Mage_Core_Helper_Data
         $scopeModel = Mage::getSingleton('createsend/config_scope');
         $storeId = $scopeModel->getStoreIdFromScope($scope, $scopeId);
 
-        return urlencode(trim($this->getStoreConfig(self::XML_PATH_API_ID, $storeId)));
+        return trim($this->getStoreConfig(self::XML_PATH_API_ID, $storeId));
     }
 
     /**
