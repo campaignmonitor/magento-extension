@@ -259,7 +259,7 @@ class Campaignmonitor_Createsend_Model_Api
                 $apiKeyOrToken = $helper->getApiKey($scope, $scopeId);
 
                 if (!$apiKeyOrToken) {
-                    $data['data']['Message'] = 'No API key set in configuration';
+                    $data['data']['Message'] = 'Empty or invalid format API key set in configuration';
                     return $data;
                 }
 
