@@ -313,16 +313,12 @@ class Campaignmonitor_Createsend_Model_Customer_Observer
         if (!empty($linkedAttributes)) {
             if ($customer->getId()) {
                 $customerData = $customer->getData();
-                Mage::log("Customer exists " . print_r($customerData, true));
             } else {
                 $customerData = array();
-                Mage::log("Customer doesn't exist ");
             }
             foreach ($linkedAttributes as $la) {
                 $magentoAtt = $la['magento'];
                 $cmAtt = $api->formatCustomFieldName($attrSource->getCustomFieldName($la['magento'], true));
-                Mage::log($cmAtt);
-
 
                 // try and translate IDs to names where possible
                 if ($magentoAtt == 'group_id') {
@@ -349,10 +345,9 @@ class Campaignmonitor_Createsend_Model_Customer_Observer
                 } elseif ($magentoAtt == 'gender') {
 
                     $gender = "";
-                    if (array_key_exists($gender, $customerData)){
+                    if (array_key_exists($magentoAtt, $customerData)){
                         $gender = $customer->getAttribute($magentoAtt)->getSource()->getOptionText($customerData[$magentoAtt]);
                     }
-
                     $customFields[] = array("Key" => $cmAtt, "Value" => $gender);
                 } elseif ($magentoAtt == 'confirmation') {
                     // This attribute should have been named confirmation_key
@@ -509,6 +504,8 @@ class Campaignmonitor_Createsend_Model_Customer_Observer
                         );
                     }
                 }
+
+
 
                 // Clear out other items, if any
                 for ($i = $count + 1; $i <= $maxWishlistItems; $i++) {

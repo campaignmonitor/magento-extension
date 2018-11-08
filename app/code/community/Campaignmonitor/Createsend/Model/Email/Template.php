@@ -32,6 +32,8 @@ class Campaignmonitor_Createsend_Model_Email_Template extends Mage_Core_Model_Em
      */
     public function send($email, $name = null, array $variables = array())
     {
+
+
         /** @var $helper Campaignmonitor_Createsend_Helper_Data */
         $helper = Mage::helper("createsend");
 
@@ -69,7 +71,7 @@ class Campaignmonitor_Createsend_Model_Email_Template extends Mage_Core_Model_Em
             'ReplyTo'       => null,
             'To'            => null,
             'CC'            => null,
-            'BCC'           => null,
+            'BCC'           => $this->_bccEmails,
             'Html'          => '',
             'Text'          => '',
             'Attachments'   => null,
@@ -119,9 +121,9 @@ class Campaignmonitor_Createsend_Model_Email_Template extends Mage_Core_Model_Em
             $this->_send($emailData, $variables);
             $this->_mail = null;
         } catch (Exception $e) {
-            $this->_mail = null;
-            $helper->log(sprintf(self::ERR_CANNOT_SEND_EMAIL, $e), Zend_Log::ERR);
-            return false;
+
+           
+            return parent::send($email, $name, $variables);
         }
 
         return true;
@@ -169,6 +171,7 @@ class Campaignmonitor_Createsend_Model_Email_Template extends Mage_Core_Model_Em
      */
     protected function _send(array $emailData, array $variables = array())
     {
+
         /** @var Campaignmonitor_Createsend_Helper_Data $helper */
         $helper = Mage::helper('createsend');
 
@@ -198,7 +201,15 @@ class Campaignmonitor_Createsend_Model_Email_Template extends Mage_Core_Model_Em
         );
 
         if (!$result['success']) {
-            throw new Exception($result['data']['Message']);
+            $notice = 'Couldn\'t send email through campaign monitor but your email was sent through magento though';
+
+            if (!empty( $result['data'] )) {
+                $notice .= ' ';
+                $notice .= $result['data']['Message'];
+            }
+            Mage::getSingleton('core/session')->addNotice($notice);
+//            throw new Exception($result['data']['Message']);
+
         }
     }
 }
